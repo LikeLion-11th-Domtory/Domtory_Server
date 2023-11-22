@@ -1,0 +1,30 @@
+version: '3'
+services:
+  nginx:
+    build: ./config/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/static
+    image: 313862985827.dkr.ecr.ap-northeast-2.amazonaws.com/domtory-nginx:latest
+    depends_on:
+      - web
+    platform: linux/amd64
+  web:
+    build:
+      context: .
+      dockerfile: ./config/web/Dockerfile
+    volumes:
+      - static_volume:/project/data/static
+      - ./:/code
+    command: ["./start.sh"]
+    ports:
+      - "8000:8000"
+    platform: linux/amd64
+    image: 313862985827.dkr.ecr.ap-northeast-2.amazonaws.com/domtory-web:latest
+    environment:
+      - DJANGO_SETTINGS_MODULE=server.settings.prod
+    env_file:
+      - .env
+volumes:
+  static_volume:
