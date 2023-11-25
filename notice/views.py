@@ -14,14 +14,14 @@ class NoticeDetailView(generics.RetrieveAPIView):
     serializer_class = NoticeListSerializer
     lookup_field = 'id'
 
-class NoticeSearchView(generics.ListAPIView):
-    serializer_class = NoticeListSerializer
+# class NoticeSearchView(generics.ListAPIView):
+#     serializer_class = NoticeListSerializer
     
-    def get_queryset(self):
-        queryset = NoticeList.objects.all()
-        title = self.request.query_params.get('title', None)
+#     def get_queryset(self):
+#         queryset = NoticeList.objects.all()
+#         title = self.request.query_params.get('title', None)
         
-        if title is not None:
-            queryset = queryset.filter(title__icontains=title)
-        return queryset
+#         if title is not None:
+#             queryset = queryset.filter(title__icontains=title)
+#         return queryset
 

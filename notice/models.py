@@ -7,7 +7,7 @@ class NoticeList(models.Model):
     post_id = models.CharField(max_length=200, default='')
     title = models.CharField(max_length=200)
     date = models.CharField(max_length=100)
-    content = models.TextField(default='')
+    content = models.TextField(null=True)
     images = models.URLField(default='')
     
     def __str__(self):
