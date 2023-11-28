@@ -2,12 +2,12 @@
 
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import MenuSerializer, BreakfastListSerializer, LunchListSerializer, DinnerListSerializer
+from .serializers import MenuSerializer
 import requests
 from bs4 import BeautifulSoup
 from rest_framework.views import APIView
-from .models import Breakfast, Lunch, Dinner, Menu
-from django.shortcuts import get_object_or_404
+from .models import Breakfast, Lunch, Dinner
+
 class CrawlingView(APIView):
     def post(self, request):
         url = 'http://cbhs2.kr/meal?searchWeek=0'
