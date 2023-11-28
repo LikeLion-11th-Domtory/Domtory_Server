@@ -1,5 +1,5 @@
 from .models import Menu
-from .serializers import MenuSerializer, BreakfastSerializer, LunchSerializer, DinnerSerializer
+from .serializers import MenuListSerializer, BreakfastListSerializer, LunchListSerializer, DinnerListSerializer
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -11,13 +11,13 @@ class MenuListView(APIView):
     def get(self, request, date_code, option):
         menus = Menu.objects.filter(date_code=date_code)
         if option == 'total':
-            serializer = MenuSerializer(menus, many=True)
+            serializer = MenuListSerializer(menus, many=True)
         elif option == 'breakfast':
-            serializer = BreakfastSerializer(menus, many=True)
+            serializer = BreakfastListSerializer(menus, many=True)
         elif option == 'lunch':
-            serializer = LunchSerializer(menus, many=True)
+            serializer = LunchListSerializer(menus, many=True)
         elif option == 'dinner':
-            serializer = DinnerSerializer(menus, many=True)
+            serializer = DinnerListSerializer(menus, many=True)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)

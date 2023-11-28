@@ -11,26 +11,26 @@ class Menu(models.Model):
 
 class Breakfast(models.Model):
     id = models.AutoField(primary_key=True)
-    date_code = models.ForeignKey(Menu, on_delete=models.CASCADE)
-    menu = models.CharField(max_length=512)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='breakfasts')
+    name = models.CharField(max_length=512)
     
     def __str__(self):
-        return self.menu
+        return self.name
 
 
 class Lunch(models.Model):
     id = models.AutoField(primary_key=True)
-    date_code = models.ForeignKey(Menu, on_delete=models.CASCADE)
-    menu = models.CharField(max_length=512)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='lunches')
+    name = models.CharField(max_length=512)
     
     def __str__(self):
-        return self.menu
+        return self.name
 
 
 class Dinner(models.Model):
     id = models.AutoField(primary_key=True)
-    date_code = models.ForeignKey(Menu, on_delete=models.CASCADE)
-    menu = models.CharField(max_length=512)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='dinners')
+    name = models.CharField(max_length=512)
     
     def __str__(self):
-        return self.menu
+        return self.name
