@@ -14,8 +14,6 @@ pymysql = "^1.1.0"
 gunicorn = "^21.2.0"
 requests = "^2.31.0"
 django-cors-headers = "^4.2.0"
-selenium = "^4.15.2"
-webdriver-manager = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
