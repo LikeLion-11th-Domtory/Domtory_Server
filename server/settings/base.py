@@ -56,6 +56,7 @@ PACKAGE_APPS = [
 ]
 
 PROJECT_APPS = [
+    'notice',
     'push',
     'menu',
 ]
