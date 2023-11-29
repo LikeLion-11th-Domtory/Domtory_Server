@@ -34,6 +34,9 @@ SECRET_KEY = config('SECRET_KEY')
 ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [
 	'http://localhost:3000',
+    'https://localhost:3000',
+    'https://domtory.site',
+    'http://domtory.site',
 ]
 
 # Application definition
