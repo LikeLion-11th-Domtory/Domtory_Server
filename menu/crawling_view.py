@@ -8,18 +8,19 @@ from bs4 import BeautifulSoup
 from rest_framework.views import APIView
 from .models import Breakfast, Lunch, Dinner
 
+
 class CrawlingView(APIView):
     def post(self, request):
         url = 'http://cbhs2.kr/meal?searchWeek=0'
-        
+
         # 웹페이지에서 HTML 내용을 가져온다
         response = requests.get(url)
         response.encoding = 'utf-8'
         html = response.text
-        
+
         # BeautifulSoup 객체를 생성하여 HTML을 파싱.
         soup = BeautifulSoup(html, 'html.parser')
-        
+
         # 모든 식단 찾기
         meal_plans = soup.find_all('div', class_='fplan_plan')
 
@@ -54,19 +55,19 @@ class CrawlingView(APIView):
                 menu_serializer = MenuSerializer(data={'date_code': date_code, 'date_detail': date_detail})
                 menu_serializer.is_valid(raise_exception=True)
                 menu = menu_serializer.save()
-                
+
                 breakfast_data = meal_info.pop('breakfast').split(',')
                 lunch_data = meal_info.pop('lunch').split(',')
                 dinner_data = meal_info.pop('dinner').split(',')
-                
+
                 for breakfast in breakfast_data:
                     breakfast = Breakfast(menu=menu, name=breakfast)
                     breakfast.save()
-                
+
                 for lunch in lunch_data:
                     lunch = Lunch(menu=menu, name=lunch)
                     lunch.save()
-                
+
                 for dinner in dinner_data:
                     dinner = Dinner(menu=menu, name=dinner)
                     dinner.save()
@@ -74,4 +75,3 @@ class CrawlingView(APIView):
             except:
                 pass
         return Response(status=status.HTTP_200_OK)
-        
