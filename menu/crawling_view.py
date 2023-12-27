@@ -7,14 +7,17 @@ import requests
 from bs4 import BeautifulSoup
 from rest_framework.views import APIView
 from .models import Breakfast, Lunch, Dinner
-
+import logging
 
 class CrawlingView(APIView):
     def post(self, request):
-        url = 'http://cbhs2.kr/meal?searchWeek=0'
+        try:
+            url = 'http://cbhs2.kr/meal?searchWeek=0'
 
-        # 웹페이지에서 HTML 내용을 가져온다
-        response = requests.get(url)
+            # 웹페이지에서 HTML 내용을 가져온다
+            response = requests.get(url)
+        except Exception as e:
+            logging.error("request error:", e)
         response.encoding = 'utf-8'
         html = response.text
 
@@ -72,6 +75,6 @@ class CrawlingView(APIView):
                     dinner = Dinner(menu=menu, name=dinner)
                     dinner.save()
 
-            except:
-                pass
+            except Exception as e:
+                logging.error("저장 오류:", e)
         return Response(status=status.HTTP_200_OK)
