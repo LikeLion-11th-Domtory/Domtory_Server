@@ -53,6 +53,7 @@ DJANGO_APPS = [
 PACKAGE_APPS = [
     'rest_framework',
     'corsheaders',
+    'drf_yasg',
 ]
 
 PROJECT_APPS = [
