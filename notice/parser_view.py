@@ -31,7 +31,7 @@ class CrawlDataView(APIView):
                     content=post['content'],
                     images=post['images']).save()
 
-        return Response(all_posts_data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
     def scrape_page(self, page):
         # Construct the URL for the specific page
