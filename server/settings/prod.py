@@ -5,6 +5,10 @@ import pymysql
 pymysql.install_as_MySQLdb()
 DEBUG = False
 
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'data/static')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
