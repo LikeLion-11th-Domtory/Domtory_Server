@@ -54,12 +54,14 @@ PACKAGE_APPS = [
     'rest_framework',
     'corsheaders',
     'drf_yasg',
+    'rest_framework_simplejwt',
 ]
 
 PROJECT_APPS = [
     'notice',
     'push',
     'menu',
+    'member',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PACKAGE_APPS + PROJECT_APPS
