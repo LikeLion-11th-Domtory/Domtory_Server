@@ -55,6 +55,7 @@ PACKAGE_APPS = [
     'corsheaders',
     'drf_yasg',
     'rest_framework_simplejwt',
+    'django_celery_results',
 ]
 
 PROJECT_APPS = [
@@ -97,16 +98,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server.wsgi.application'
 AUTH_USER_MODEL = 'member.Member'
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 
 # Password validation
@@ -162,3 +153,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#######celery#######
+CELERY_TIMEZONE = 'Asia/Seoul'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
