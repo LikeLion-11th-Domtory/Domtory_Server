@@ -7,5 +7,9 @@ class Device(models.Model):
     last_logged_in_at = models.DateTimeField(auto_now_add=True)
     is_valid = models.BooleanField(default=True)
 
+    def set_valid(self, valid):
+        if self.is_valid != valid:
+            self.is_valid = valid
+
     class Meta:
         db_table = 'device'
