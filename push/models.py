@@ -1,1 +1,1 @@
-from .domains import Device
+from .domains.device import Device
