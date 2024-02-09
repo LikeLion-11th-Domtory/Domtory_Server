@@ -6,8 +6,8 @@ class Post(models.Model):
     """
     게시글 모델
     """
-    member = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, related_name = 'post')
-    board = models.ForeignKey(Board, null = False, on_delete = models.CASCADE, related_name = 'post')
+    member_id = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, related_name = 'post')
+    board_id = models.ForeignKey(Board, null = False, on_delete = models.CASCADE, related_name = 'post')
     title = models.CharField(max_length = 90, null = False) # 한글 30글자
     body = models.TextField(default = "")
     created_at = models.DateTimeField(auto_now_add = True)
@@ -28,7 +28,7 @@ class PostImage(models.Model):
     """
     게시글 이미지 모델
     """
-    post = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, related_name = 'post_image')
+    post_id = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, related_name = 'post_image')
     image_url = models.TextField(null = False)
 
     def __str__(self):

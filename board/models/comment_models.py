@@ -7,8 +7,8 @@ class Comment(models.Model):
     댓글 모델
     """
     member = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, related_name = 'comment')
-    post = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, related_name = 'comment')
-    parent = models.ForeignKey('self', null = True, blank = True, on_delete = models.PROTECT, related_name = 'reply')
+    post_id = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, related_name = 'comment')
+    parent_id = models.ForeignKey('self', null = True, blank = True, on_delete = models.PROTECT, related_name = 'reply')
     body = models.TextField(default = "", null = False)
     created_at = models.DateTimeField(auto_now_add = True)
     is_blocked = models.BooleanField(default = False, blank = True)
