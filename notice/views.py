@@ -6,7 +6,7 @@ from rest_framework import generics
 # Create your views here.
 
 class NoticeListView(generics.ListAPIView):
-    queryset = NoticeList.objects.all()
+    queryset = NoticeList.objects.all().order_by('-date')
     serializer_class = NoticeListSerializer
 
 class NoticeDetailView(generics.RetrieveAPIView):

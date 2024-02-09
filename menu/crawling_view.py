@@ -64,15 +64,15 @@ class CrawlingView(APIView):
                 dinner_data = meal_info.pop('dinner').split(',')
 
                 for breakfast in breakfast_data:
-                    breakfast = Breakfast(menu=menu, name=breakfast)
+                    breakfast = Breakfast(menu=menu, name=breakfast.strip())
                     breakfast.save()
 
                 for lunch in lunch_data:
-                    lunch = Lunch(menu=menu, name=lunch)
+                    lunch = Lunch(menu=menu, name=lunch.strip())
                     lunch.save()
 
                 for dinner in dinner_data:
-                    dinner = Dinner(menu=menu, name=dinner)
+                    dinner = Dinner(menu=menu, name=dinner.strip())
                     dinner.save()
 
             except Exception as e:

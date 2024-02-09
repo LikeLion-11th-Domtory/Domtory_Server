@@ -26,5 +26,39 @@ services:
       - DJANGO_SETTINGS_MODULE=server.settings.prod
     env_file:
       - .env
+    depends_on:
+      - rabbitmq
+  beat:
+    image: 313862985827.dkr.ecr.ap-northeast-2.amazonaws.com/domtory-beat:latest
+    build:
+      context: .
+      dockerfile: ./config/web/Dockerfile
+    command: celery -A server celery_beat beat --loglevel info
+    platform: linux/amd64
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+  worker:
+    image: 313862985827.dkr.ecr.ap-northeast-2.amazonaws.com/domtory-worker:latest
+    build:
+      context: .
+      dockerfile: ./config/web/Dockerfile
+    command: celery -A server worker -P gevent -c 100 --loglevel=info
+    platform: linux/amd64
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:3.12-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    platform: linux/amd64
+    command: rabbitmq-plugins enable rabbitmq_management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 volumes:
   static_volume:
