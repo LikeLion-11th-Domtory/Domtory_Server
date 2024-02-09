@@ -19,11 +19,11 @@ def validate_email(email):
     if Member.objects.filter(email=email).exists():
         raise ValidationError("이미 가입된 회원이에요!")
     
-    email_reg = r"^[a-zA-Z0-9_-]{6,13}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    email_reg = r"^[a-zA-Z0-9_-]{4,13}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     email_regex = re.compile(email_reg)
 
     if not email_regex.match(email):
-        raise ValidationError("이메일의 아이디는 6자 이상 13자 이하로 가능하고, 특수 문자는 _와 -만 사용 가능해요.")
+        raise ValidationError("이메일의 아이디는 4자 이상 13자 이하로 가능하고, 특수 문자는 _와 -만 사용 가능해요.")
     
 def validate_nickname(nickname):
     if Member.objects.filter(nickname=nickname).exists():
