@@ -58,7 +58,7 @@ class PostUpdateDeleteView(APIView):
 
 class PostDetailView(RetrieveAPIView):
     """
-    게시글 삭제 뷰
+    게시글 디테일 뷰
     """
     queryset = Post.objects.all()
     authentication_classes = [JWTAuthentication]

@@ -5,7 +5,7 @@ from .comment_serializer import *
 class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImage
-        fields = ['post', 'image_url']
+        fields = '__all__'
 
 
 class PostRequestSerializer(serializers.ModelSerializer):
