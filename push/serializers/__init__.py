@@ -1,1 +1,1 @@
-from .push_serializers import TokenSendRequestSerializer
+from .push_serializers import TokenRequestSerializer
