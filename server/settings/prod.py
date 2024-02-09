@@ -19,3 +19,5 @@ DATABASES = {
         'PORT': config('DB_PORT'),
     }
 }
+
+CELERY_BROKER_URL = 'amqp://admin:admin@rabbitmq:5672//'
