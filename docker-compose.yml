@@ -33,7 +33,7 @@ services:
     build:
       context: .
       dockerfile: ./config/web/Dockerfile
-    command: celery -A server beat --loglevel info
+    command: celery -A server.celery_beat beat --loglevel info
     platform: linux/amd64
     env_file:
       - .env
