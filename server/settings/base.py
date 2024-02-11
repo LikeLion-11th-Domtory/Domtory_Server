@@ -62,6 +62,7 @@ PROJECT_APPS = [
     'notice',
     'push',
     'menu',
+    'report',
     'member',
     'board',
 ]
