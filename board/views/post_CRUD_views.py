@@ -104,7 +104,7 @@ class PostUpdateView(APIView):
                 if first_image:
                     post.thumbnail_url = first_image.image_url
                 else:
-                    post.thumbnail_url = ""
+                    post.thumbnail_url = None
                 post.save()
                 return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
             except:
