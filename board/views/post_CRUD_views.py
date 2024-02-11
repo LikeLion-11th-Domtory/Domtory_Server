@@ -67,9 +67,9 @@ class PostCreateView(APIView):
                 post.save()
 
 
-class PostUpdateDeleteView(APIView):
+class PostUpdateView(APIView):
     """
-    게시글 수정 및 삭제 뷰
+    게시글 수정 뷰
     """
     authentication_classes = [JWTAuthentication]
     serializer_class = PostRequestSerializer
@@ -84,7 +84,14 @@ class PostUpdateDeleteView(APIView):
             return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-        
+    
+
+class PostDeleteView(APIView):
+    """
+    게시글 삭제 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsOwnerOrReadOnly]
     def delete(self, request, post_id):
         post = get_object_or_404(Post, pk = post_id)
         post.is_deleted = True
