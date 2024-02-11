@@ -106,7 +106,7 @@ class PostUpdateView(APIView):
                 else:
                     post.thumbnail_url = ""
                 post.save()
-                return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+                return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
             except:
 
                 res = {
@@ -151,7 +151,7 @@ class PostDeleteView(APIView):
         res = {
             "msg" : "게시글 삭제 완료"
         }
-        return Response(res, status = status.HTTP_201_CREATED)
+        return Response(res, status = status.HTTP_204_NO_CONTENT)
 
 
 class PostDetailView(APIView):
