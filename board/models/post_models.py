@@ -22,6 +22,9 @@ class Post(models.Model):
         # member_id 필드를 request.user로 설정
         validated_data['member'] = self.context['request'].user
         return super().create(validated_data)
+    
+    class Meta:
+        db_table = 'post'
 
 
 class PostImage(models.Model):
@@ -35,3 +38,7 @@ class PostImage(models.Model):
 
     def __str__(self):
         return self.image_url
+
+    
+    class Meta:
+        db_table = 'post_image'
