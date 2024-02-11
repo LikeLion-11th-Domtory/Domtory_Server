@@ -27,7 +27,7 @@ class PostCreateView(APIView):
         serializer = PostRequestSerializer(data = request.data)
         if serializer.is_valid():
             board = get_object_or_404(Board, pk = board_id)
-            post = serializer.save(member_id = request.user, board_id = board)
+            post = serializer.save(member = request.user, board = board)
 
             res = {
                 "msg" : "게시글 작성 성공",

@@ -18,7 +18,7 @@ class PostListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, board_id):
-        posts = Post.objects.filter(board_id = board_id, is_blocked = False, is_deleted = False).order_by('-created_at')
+        posts = Post.objects.filter(board = board_id, is_blocked = False, is_deleted = False).order_by('-created_at')
         serializer = PostSimpleSerializer(posts, many = True)
         board = Board.objects.get(pk = board_id)
         res = {
@@ -36,7 +36,7 @@ class FreeBoardSimpleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        latest_posts = Post.objects.filter(board_id = 1, is_blocked = False, is_deleted = False).order_by('-created_at')[:5]
+        latest_posts = Post.objects.filter(board = 1, is_blocked = False, is_deleted = False).order_by('-created_at')[:5]
         serializer = PostSimpleSerializer(latest_posts, many = True)
         res = {
             "msg" : "자유게시판 최근 5개 게시물 반환",

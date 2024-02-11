@@ -27,7 +27,7 @@ class PostCreateView(APIView):
         board = Board.objects.get(pk = board_id)
         serializer = PostRequestSerializer(data = request.data)
         if serializer.is_valid():
-            post = serializer.save(member_id = request.user, board_id = board)
+            post = serializer.save(member = request.user, board = board)
 
             image_request_serializer = ImageRequestSerializer(data = request.data)
             image_request_serializer.is_valid(raise_exception=True)
@@ -71,7 +71,7 @@ class PostCreateView(APIView):
             image_file = InMemoryUploadedFile(image_io, None, uuid_key, 'image/jpeg', image_io.tell(), None)
 
             image_file.content_type = 'image/jpeg'
-            key = f"{post.board_id.name}_{post.pk}_{uuid_key}.jpeg"
+            key = f"{post.board.name}_{post.pk}_{uuid_key}.jpeg"
             s3.upload_to_s3(image_file, key)
 
 
@@ -86,7 +86,7 @@ class PostCreateView(APIView):
             image_file = InMemoryUploadedFile(image_io, None, uuid_key, 'image/jpeg', image_io.tell(), None)
 
             image_file.content_type = 'image/jpeg'
-            key = f"{post.board_id.name}_{post.pk}_{uuid_key}.jpeg"
+            key = f"{post.board.name}_{post.pk}_{uuid_key}.jpeg"
             s3.upload_to_s3(image_file, key)
 
 

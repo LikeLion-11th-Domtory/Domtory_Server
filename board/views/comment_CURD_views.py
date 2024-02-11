@@ -20,7 +20,7 @@ class CommentCreateView(APIView):
         post = get_object_or_404(Post, pk = post_id)
         serializer = CommentRequestSerializer(data = request.data)
         if serializer.is_valid():
-            serializer.save(post_id = post, member_id = request.user)
+            serializer.save(post = post, member = request.user)
             res = {
                 "msg" : "성공적으로 댓글 작성",
                 "data" : PostResponseSerializer(post).data
@@ -42,7 +42,7 @@ class CommentDeleteView(APIView):
 
     def delete(self, request, comment_id):
         comment = get_object_or_404(Comment, pk = comment_id)
-        post = comment.post_id
+        post = comment.post
         self.check_object_permissions(request, comment)
 
         comment.is_deleted = True
@@ -65,11 +65,11 @@ class ReplyCreateView(APIView):
 
     def post(self, request, comment_id):
         comment = get_object_or_404(Comment, pk = comment_id)
-        post = comment.post_id
+        post = comment.post
         serializer = ReplyRequestSerializer(data = request.data)
         if serializer.is_valid():
-            reply = serializer.save(parent_id = comment, post_id = post, member_id = request.user)
-            post = reply.parent_id.post_id
+            reply = serializer.save(parent = comment, post = post, member = request.user)
+            post = reply.parent.post
             res = {
                 "msg" : "성공적으로 대댓글 작성",
                 "data" : PostResponseSerializer(post).data
@@ -91,7 +91,7 @@ class ReplyDeleteView(APIView):
 
     def delete(self, request, reply_id):
         reply = get_object_or_404(Comment, pk = reply_id)
-        post = reply.post_id
+        post = reply.post
         self.check_object_permissions(request, reply)
 
         reply.is_deleted = True

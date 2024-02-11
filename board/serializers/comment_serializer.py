@@ -4,23 +4,23 @@ from ..models import Comment
 class ReplyRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'parent_id', 'body']
+        fields = ['id', 'parent', 'body']
 
 
 class ReplyResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'member_id', 'parent_id', 'body', 'created_at', 'is_blocked', 'is_deleted']
+        fields = ['id', 'member', 'parent', 'body', 'created_at', 'is_blocked', 'is_deleted']
 
 
 class CommentRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'member_id', 'post_id', 'body']
+        fields = ['id', 'member', 'post', 'body']
 
 
 class CommentResponseSerializer(serializers.ModelSerializer):
     reply = ReplyResponseSerializer(many = True)
     class Meta:
         model = Comment
-        fields = ['id', 'member_id', 'body', 'created_at', 'is_blocked', 'is_deleted', 'reply']
+        fields = ['id', 'member', 'body', 'created_at', 'is_blocked', 'is_deleted', 'reply']
