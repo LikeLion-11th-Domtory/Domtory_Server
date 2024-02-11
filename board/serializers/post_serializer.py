@@ -37,4 +37,4 @@ class PostResponseSerializer(serializers.ModelSerializer):
 class PostSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'member_id', 'title', 'thumbnail_url', 'created_at']
+        fields = ['id', 'member', 'title', 'thumbnail_url', 'created_at']
