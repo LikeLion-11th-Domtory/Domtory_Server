@@ -42,28 +42,3 @@ class CreateReportView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-# #개발 편의용
-# class ReadReportView(APIView):
-#     def get(self, request, target_type, target_id):
-#         if target_type == "post":
-#             target = Post.objects.get(pk=target_id)
-#         elif target_type == "comment":
-#             target = Comment.objects.get(pk=target_id)
-
-#         serializer = ReportSerializer(target)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-# class UpdateReportStatusView(APIView):
-#     #PENDING일 경우
-#     def put(self, request, target_id, target_type):
-#         if target_type == "post":
-#             target = Post.objects.get(pk=target_id)
-#         elif target_type == "comment":
-#             target = Comment.objects.get(pk=target_id)
-
-#         serializer = UpdateReportSerializer(target, data=request.data)
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
-
