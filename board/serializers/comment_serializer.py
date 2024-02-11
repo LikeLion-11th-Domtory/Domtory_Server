@@ -20,7 +20,7 @@ class CommentRequestSerializer(serializers.ModelSerializer):
 
 
 class CommentResponseSerializer(serializers.ModelSerializer):
-    reply = CommentRequestSerializer(many = True)
+    reply = ReplyResponseSerializer(many = True)
     class Meta:
         model = Comment
         fields = ['id', 'member_id', 'body', 'created_at', 'is_blocked', 'is_deleted', 'reply']
