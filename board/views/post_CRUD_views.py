@@ -99,7 +99,6 @@ class PostUpdateView(APIView):
         if image_list:
             try:
                 self.upload_image(post, image_list)
-                # post.save()
                 first_image = post.post_image.first()
                 if first_image:
                     post.thumbnail_url = first_image.image_url
