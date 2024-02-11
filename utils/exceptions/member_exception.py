@@ -20,3 +20,7 @@ class BannedMemberError(APIException):
 class AdminUnAcceptedMemberError(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = '아직 학사 정보가 확인되지 않은 회원입니다.'
+
+class SamePasswordError(APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = '같은 비밀번호로는 지정할 수 없습니다.'
