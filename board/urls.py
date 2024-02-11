@@ -11,6 +11,7 @@ urlpatterns = [
     path('post/delete/<int:post_id>/', PostDeleteView.as_view()), # 게시글 삭제
     path('post/list/<int:board_id>/', PostListView.as_view()), # 특정 게시판의 게시글 리스트
     path('post/latest/<int:board_id>/', FreeBoardSimpleView.as_view()), # 특정 게시판의 최근 5개 게시글
+    path('post/search/', PostSearchView.as_view()),
 
     # 댓글 API
     path('comment/create/<int:post_id>/', CommentCreateView.as_view()), # 댓글 작성
