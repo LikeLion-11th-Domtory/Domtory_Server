@@ -35,14 +35,14 @@ class PushService:
         )
         return message
     
-    def make_token_invalid(self, request_data):
+    def delete_device(self, request_data, request_user):
         token_send_request_serializer = TokenRequestSerializer(data=request_data)
         token_send_request_serializer.is_valid(raise_exception=True)
         token_data = token_send_request_serializer.validated_data
 
-        device: Device = self._push_repository.find_device_by_token(token_data.get('push_token'))
-        device.set_valid(False)
-        self._push_repository.save_device(device)
+        device: Device = self._push_repository.find_device_by_token_and_member(token_data.get('push_token'), request_user)
+
+        self._push_repository.delete_device(device)
 
     def send_push_notification(self, message):
         response = messaging.send_multicast(message)
