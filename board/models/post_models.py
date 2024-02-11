@@ -13,7 +13,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add = True)
     is_blocked = models.BooleanField(default = False, blank = True)
     is_deleted = models.BooleanField(default = False, blank = True)
-    thumbnail_url = models.TextField(null = True, blank = True)
+    thumbnail_url = models.CharField(null = True, blank = True, max_length = 255)
 
     def __str__(self):
         return self.title
@@ -29,7 +29,9 @@ class PostImage(models.Model):
     게시글 이미지 모델
     """
     post_id = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, related_name = 'post_image')
-    image_url = models.TextField(null = False)
+    image_url = models.CharField(null = False, max_length = 255)
+    is_deleted = models.BooleanField(default = False, blank = True)
+    is_thumbnail = models.BooleanField(default = False)
 
     def __str__(self):
         return self.image_url
