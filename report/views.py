@@ -34,7 +34,6 @@ class CreateReportView(APIView):
                 'table' : target_type,
                 'report_id' : serializer.data['id']
             }
-            # dataset = json.dumps(dataset, ensure_ascii=False)
             response = requests.post('https://8ufbqa4zl8.execute-api.ap-northeast-2.amazonaws.com/prod', json=dataset)
             print(response.content)
             print(dataset)
