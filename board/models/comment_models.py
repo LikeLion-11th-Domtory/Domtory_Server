@@ -6,7 +6,7 @@ class Comment(models.Model):
     """
     댓글 모델
     """
-    member = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, related_name = 'comment')
+    member_id = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, related_name = 'comment')
     post_id = models.ForeignKey(Post, null = False, blank = True, on_delete = models.CASCADE, related_name = 'comment')
     parent_id = models.ForeignKey('self', null = True, blank = True, on_delete = models.PROTECT, related_name = 'reply')
     body = models.TextField(default = "", null = False)
