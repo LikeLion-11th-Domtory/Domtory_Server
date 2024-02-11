@@ -11,8 +11,8 @@ class Comment(models.Model):
     parent = models.ForeignKey('self', null = True, blank = True, on_delete = models.PROTECT, related_name = 'reply')
     body = models.TextField(default = "", null = False)
     created_at = models.DateTimeField(auto_now_add = True)
-    is_blocked = models.BooleanField(default = False, blank = True)
-    is_deleted = models.BooleanField(default = False, blank = True)
+    is_blocked = models.BooleanField(default = False)
+    is_deleted = models.BooleanField(default = False)
 
     def __str__(self):
         return self.body

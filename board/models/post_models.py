@@ -11,9 +11,9 @@ class Post(models.Model):
     title = models.CharField(max_length = 90, null = False) # 한글 30글자
     body = models.TextField(default = "")
     created_at = models.DateTimeField(auto_now_add = True)
-    is_blocked = models.BooleanField(default = False, blank = True)
-    is_deleted = models.BooleanField(default = False, blank = True)
-    thumbnail_url = models.CharField(null = True, blank = True, max_length = 255)
+    is_blocked = models.BooleanField(default = False)
+    is_deleted = models.BooleanField(default = False)
+    thumbnail_url = models.CharField(null = True, max_length = 255)
 
     def __str__(self):
         return self.title
@@ -30,7 +30,7 @@ class PostImage(models.Model):
     """
     post = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, related_name = 'post_image')
     image_url = models.CharField(null = False, max_length = 255)
-    is_deleted = models.BooleanField(default = False, blank = True)
+    is_deleted = models.BooleanField(default = False)
     is_thumbnail = models.BooleanField(default = False)
 
     def __str__(self):
