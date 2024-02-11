@@ -21,25 +21,17 @@ class PostListView(APIView):
         posts = Post.objects.filter(board = board_id, is_blocked = False, is_deleted = False).order_by('-created_at')
         serializer = PostSimpleSerializer(posts, many = True)
         board = Board.objects.get(pk = board_id)
-        res = {
-            "msg" : f"{board.name}의 게시글 목록",
-            "data" : serializer.data
-        }
-        return Response(res, status = status.HTTP_200_OK)
+        return Response(serializer.data, status = status.HTTP_200_OK)
     
 
 class FreeBoardSimpleView(APIView):
     """
-    자유게시판 상위 5개
+    특정 게시판의 게시물 상위 5개를 출력하는 뷰
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        latest_posts = Post.objects.filter(board = 1, is_blocked = False, is_deleted = False).order_by('-created_at')[:5]
+    def get(self, request, board_id):
+        latest_posts = Post.objects.filter(board = board_id, is_blocked = False, is_deleted = False).order_by('-created_at')[:5]
         serializer = PostSimpleSerializer(latest_posts, many = True)
-        res = {
-            "msg" : "자유게시판 최근 5개 게시물 반환",
-            "data" : serializer.data
-        }
-        return Response(res, status = status.HTTP_200_OK)
+        return Response(serializer.data, status = status.HTTP_200_OK)

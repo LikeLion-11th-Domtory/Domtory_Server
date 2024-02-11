@@ -21,16 +21,8 @@ class CommentCreateView(APIView):
         serializer = CommentRequestSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save(post = post, member = request.user)
-            res = {
-                "msg" : "성공적으로 댓글 작성",
-                "data" : PostResponseSerializer(post).data
-            }
-            return Response(res, status = status.HTTP_201_CREATED)
-        res = {
-            "msg" : "댓글 작성 실패",
-            "data" : serializer.errors
-        }
-        return Response(res, status = status.HTTP_400_BAD_REQUEST)
+            return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         
 
 class CommentDeleteView(APIView):
@@ -47,12 +39,8 @@ class CommentDeleteView(APIView):
 
         comment.is_deleted = True
         comment.save()
-        
-        res = {
-            "msg" : "댓글 삭제 성공",
-            "data" : PostResponseSerializer(post).data
-        }
-        return Response(res, status = status.HTTP_201_CREATED)
+
+        return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
 
 
 
@@ -70,16 +58,9 @@ class ReplyCreateView(APIView):
         if serializer.is_valid():
             reply = serializer.save(parent = comment, post = post, member = request.user)
             post = reply.parent.post
-            res = {
-                "msg" : "성공적으로 대댓글 작성",
-                "data" : PostResponseSerializer(post).data
-            }
-            return Response(res, status = status.HTTP_201_CREATED)
-        res = {
-            "msg" : "대댓글 작성 실패",
-            "data" : serializer.errors
-        }
-        return Response(res, status = status.HTTP_400_BAD_REQUEST)
+            
+            return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
     
 
 class ReplyDeleteView(APIView):
@@ -96,10 +77,5 @@ class ReplyDeleteView(APIView):
 
         reply.is_deleted = True
         reply.save()
-
-        res = {
-            "msg" : "성공적으로 대댓글 삭제",
-            "data" : PostResponseSerializer(post).data
-        }
-        return Response(res, status = status.HTTP_201_CREATED)
+        return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         

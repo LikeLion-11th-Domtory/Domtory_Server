@@ -34,64 +34,35 @@ class PostCreateView(APIView):
             image_data = image_request_serializer.validated_data
             image_list = image_data.get('images')
             if image_list:
-                
-                res = {
-                    "msg" : "게시글 작성 성공",
-                    "data" : PostResponseSerializer(post).data
-                    # "data" : image_list[0].content_type
-                }
-                return Response(res, status = status.HTTP_201_CREATED)
-                # except:
-                #     post.delete()
-                #     res = {
-                #         "msg" : "유효하지 않은 이미지"
-                #     }
-                #     return Response(res, status = status.HTTP_400_BAD_REQUEST)
-        res = {
-            "msg" : "유효하지 않은 게시글 데이터"
-        }
-        return Response(res, status = status.HTTP_400_BAD_REQUEST)
+                try:
+                    return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+                except:
+                    post.delete()
+                    res = {
+                        "msg" : "이미지 업로드 실패"
+                    }
+                    return Response(res, status = status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def upload_image(self, post, image_list):
         s3 = S3Connect()
         for i in range(0, len(image_list)):
             image = Image.open(image_list[i])
-            image_thumbnail = image.copy()
+            image = image.convert('RGB')
+
+            image.thumbnail((2500, 2500))
+            buffer = BytesIO()
+            image.save(buffer, format = 'JPEG', quality = 80)
+            image_data = buffer.getvalue()
+
+            key = f"{post.board.name}_{post.pk}_{uuid.uuid4().hex}.jpeg"
+            image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
+            
+            PostImage(post = post, image_url = image_url).save()
+            
             if i == 0:
-                self.post_thumbnail(post, image_thumbnail, s3)
-            image_format = image.format
-
-            image = image.convert('RGB')
-            image.thumbnail((2000, 2000))
-
-            image_io = BytesIO()
-            image.save(image_io, format = 'JPEG', quality = 85)
-
-            uuid_key = uuid.uuid4().hex
-            image_file = InMemoryUploadedFile(image_io, None, uuid_key, 'image/jpeg', image_io.tell(), None)
-
-            image_file.content_type = 'image/jpeg'
-            key = f"{post.board.name}_{post.pk}_{uuid_key}.jpeg"
-            s3.upload_to_s3(image_file, key)
-
-
-    def post_thumbnail(self, post, image, s3):
-            image = image.convert('RGB')
-            image.thumbnail((1000, 1000))
-
-            image_io = BytesIO()
-            image.save(image_io, format = 'JPEG', quality = 85)
-
-            uuid_key = uuid.uuid4().hex
-            image_file = InMemoryUploadedFile(image_io, None, uuid_key, 'image/jpeg', image_io.tell(), None)
-
-            image_file.content_type = 'image/jpeg'
-            key = f"{post.board.name}_{post.pk}_{uuid_key}.jpeg"
-            s3.upload_to_s3(image_file, key)
-
-
-
-
+                post.thumbnail_url = image_url
+                post.save()
 
 
 class PostUpdateDeleteView(APIView):
@@ -108,20 +79,14 @@ class PostUpdateDeleteView(APIView):
         serializer = PostRequestSerializer(post, data = request.data)
         if serializer.is_valid():
             serializer.save()
-            res = {
-                "msg" : "게시글 수정 성공",
-                "data" : PostResponseSerializer(post).data
-            }
-            return Response(res, status = status.HTTP_200_OK)
+            return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
         else:
-            res = {
-                "msg" : "유효하지 않은 데이터"
-            }
-            return Response(res, status = status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         
     def delete(self, request, post_id):
         post = get_object_or_404(Post, pk = post_id)
         post.is_deleted = True
+        post.save()
         res = {
             "msg" : "게시글 삭제 완료"
         }
@@ -138,8 +103,4 @@ class PostDetailView(APIView):
     def get(self, requset, post_id):
         post = get_object_or_404(Post, pk = post_id)
         serializer = PostResponseSerializer(post)
-        res = {
-            "msg" : "게시글 상세정보",
-            "data" : serializer.data
-        }
-        return Response(res, status = status.HTTP_200_OK)
+        return Response(serializer.data, status = status.HTTP_200_OK)
