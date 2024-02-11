@@ -41,4 +41,4 @@ class PostImage(models.Model):
 
     
     class Meta:
-        db_table = 'postImage'
+        db_table = 'post_image'
