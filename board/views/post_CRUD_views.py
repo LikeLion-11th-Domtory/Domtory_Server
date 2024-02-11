@@ -35,6 +35,7 @@ class PostCreateView(APIView):
             image_list = image_data.get('images')
             if image_list:
                 try:
+                    self.upload_image(post, image_list)
                     return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
                 except:
                     post.delete()
@@ -42,6 +43,7 @@ class PostCreateView(APIView):
                         "msg" : "이미지 업로드 실패"
                     }
                     return Response(res, status = status.HTTP_400_BAD_REQUEST)
+            return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def upload_image(self, post, image_list):
@@ -50,7 +52,7 @@ class PostCreateView(APIView):
             image = Image.open(image_list[i])
             image = image.convert('RGB')
 
-            image.thumbnail((2500, 2500))
+            image.thumbnail((2000, 2000))
             buffer = BytesIO()
             image.save(buffer, format = 'JPEG', quality = 80)
             image_data = buffer.getvalue()
