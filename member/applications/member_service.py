@@ -28,7 +28,7 @@ class MemberService:
         signup_request_serializer = SignupRequestSerializer(data=request_data)
         signup_request_serializer.is_valid(raise_exception=True)
         signup_data = signup_request_serializer.validated_data
-        
+        print(signup_data)
         url = self._save_dormitory_card_image(signup_data)
         member = self._make_member(signup_data, url)
         self._member_repository.save_member(member)
@@ -84,6 +84,7 @@ class MemberService:
             nickname=signup_data.get('nickname'),
             phone_number=signup_data.get('phone_number'),
             name=signup_data.get('name'),
+            birthday=signup_data.get('birthday'),
             dormitory_card=url
         )
         return member
