@@ -43,6 +43,7 @@ urlpatterns = [
     path('push/', include('push.urls')),
     path('menu/', include('menu.urls')),
     path('member/', include('member.urls')),
+    path('report/', include('report.urls')),
 ]
 
 urlpatterns += [

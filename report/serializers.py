@@ -6,7 +6,7 @@ class ReportSerializer(serializers.ModelSerilaizer):
         model = Report
         fields = '__all__'
         
-class UpdateReportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Report
-        fields = ['id', 'status']
+# class UpdateReportSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Report
+#         fields = ['id', 'status']

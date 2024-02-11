@@ -1,4 +1,5 @@
 from django.db import models
+# from borad import Comment, Post
 
 # Create your models here.
 
@@ -11,5 +12,5 @@ class Report(models.Model):
     status = models.CharField(choices=ReportType.choices, default="WAITING")
     reported_at = models.DateTimeField(auto_now_add=True)
     # report_type = 
-    post_id = models.ForeignKey(Post, null=True)
-    comment_id = models.ForeignKey(Comment, null=True)
+    post = models.ForeignKey(Post, null=True)
+    comment = models.ForeignKey(Comment, null=True)
