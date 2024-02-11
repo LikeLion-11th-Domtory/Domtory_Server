@@ -13,3 +13,4 @@ class Device(models.Model):
 
     class Meta:
         db_table = 'device'
+        unique_together = (('device_token', 'member'),)
