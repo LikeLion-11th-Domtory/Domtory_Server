@@ -9,7 +9,7 @@ urlpatterns = [
     path('post/detail/<int:post_id>/', PostDetailView.as_view()),
     path('post/update/<int:post_id>/', PostUpdateDeleteView.as_view()),
     path('post/list/<int:board_id>/', PostListView.as_view()),
-    path('post/latest/freeboard/', FreeBoardSimpleView.as_view()),
+    path('post/latest/<int:board_id>/', FreeBoardSimpleView.as_view()),
 
     # 이미지 API
     # path('image/upload/<int:post_id>/', ImageUploadView.as_view()),
