@@ -8,10 +8,17 @@ class PostImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ImageRequestSerializer(serializers.ModelSerializer):
+    images = serializers.ListField(child = serializers.ImageField())
+    class Meta:
+        model = PostImage
+        fields = ['images']
+
+
 class PostRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'board', 'title', 'body']
+        fields = ['title', 'body']
 
 
 class PostResponseSerializer(serializers.ModelSerializer):
@@ -20,3 +27,14 @@ class PostResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+
+    def get_comment(self, obj):
+        comments = obj.comment.filter(parent_id__isnull=True)
+        serializer = CommentResponseSerializer(comments, many=True).data
+        return serializer
+
+
+class PostSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'member_id', 'title', 'thumbnail_url', 'created_at']
