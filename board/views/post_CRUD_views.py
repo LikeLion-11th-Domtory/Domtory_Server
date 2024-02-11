@@ -43,6 +43,7 @@ class PostCreateView(APIView):
                         "msg" : "이미지 업로드 실패"
                     }
                     return Response(res, status = status.HTTP_400_BAD_REQUEST)
+            return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def upload_image(self, post, image_list):
