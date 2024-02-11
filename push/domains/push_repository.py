@@ -14,3 +14,6 @@ class PushRepository:
     
     def find_all_devices_by_member_id(self, member_id: int):
         pass
+
+    def delete_device(self, device: Device):
+        Device.delete()
