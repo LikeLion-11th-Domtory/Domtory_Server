@@ -117,10 +117,10 @@ class MemberService:
         return datetime.now(seoul_tz)
 
     def _can_change_password(self, old_password, new_password, request_member_password):
-        if check_password(new_password, request_member_password):
-            raise SamePasswordError
         if not check_password(old_password, request_member_password):
             raise PasswordWrongError
+        if check_password(new_password, request_member_password):
+            raise SamePasswordError
 
     class SigninDto:
         def __init__(self, access_token: str, refresh_token: str, member: Member):
