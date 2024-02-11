@@ -4,13 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status
 import requests
 
-# from board.models import *
+from board.models import *
 from .serializers import *
 
 # Create your views here.
 
 class CreateReportView(APIView):
-    # response = requests.post('', params=)
     def post(self, request, target_type, target_id):
         if target_type == "post":
             target = Post.objects.get(pk=target_id)
@@ -35,8 +34,19 @@ class CreateReportView(APIView):
                 }
             response = requests.post('https://8ufbqa4zl8.execute-api.ap-northeast-2.amazonaws.com/prod', data=dataset)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(response, serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+# #개발 편의용
+# class ReadReportView(APIView):
+#     def get(self, request, target_type, target_id):
+#         if target_type == "post":
+#             target = Post.objects.get(pk=target_id)
+#         elif target_type == "comment":
+#             target = Comment.objects.get(pk=target_id)
+
+#         serializer = ReportSerializer(target)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 # class UpdateReportStatusView(APIView):
 #     #PENDING일 경우
