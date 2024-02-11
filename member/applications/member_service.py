@@ -5,11 +5,13 @@ from member.serializers import (
                             SigninResponseSerializer,
                         )
 from member.domains import Member
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from utils.exceptions import PasswordWrongError, WithdrawedMemberError, BannedMemberError, AdminUnAcceptedMemberError
 from utils.s3 import S3Connect
-from django.contrib.auth.hashers import make_password
+from django.db import transaction
+from datetime import datetime
+import pytz, uuid
 
 class MemberService:
     def __init__(self, member_repository: MemberRepository):
@@ -40,6 +42,12 @@ class MemberService:
         signin_serializer = SigninResponseSerializer(self.SigninDto(access_token, refresh, member))
         return signin_serializer.data
     
+    @transaction.atomic
+    def withdraw(self, member: Member):
+        anonymizated_member: Member = self._make_member_anonymization(member)
+        anonymizated_member.status = 'WITHDRAWAL'
+        self._member_repository.save_member(anonymizated_member)
+
     def _save_dormitory_card_image(self, signup_data):
         s3_conn = S3Connect()
         dormitory_card = signup_data.get('dormitory_card')
@@ -72,6 +80,20 @@ class MemberService:
             raise WithdrawedMemberError
         elif member.status == 'BANNED':
             raise BannedMemberError
+
+    def _make_member_anonymization(self, target_member: Member) -> Member:
+        target_member.set_unusable_password()
+        target_member.dormitory_code = 'unknown'
+        target_member.nickname = str(uuid.uuid4()).replace('-', '').upper()
+        target_member.phone_number = 'unknown'
+        target_member.name = 'unknown'
+        target_member.dormitory_card = 'unknown'
+        target_member.birthday = self._return_seoul_datetime_object()
+        return target_member
+
+    def _return_seoul_datetime_object(self):
+        seoul_tz = pytz.timezone('Asia/Seoul')
+        return datetime.now(seoul_tz)
 
     class SigninDto:
         def __init__(self, access_token: str, refresh_token: str, member: Member):
