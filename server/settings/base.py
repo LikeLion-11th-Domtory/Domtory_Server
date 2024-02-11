@@ -62,11 +62,9 @@ PROJECT_APPS = [
     'notice',
     'push',
     'menu',
-<<<<<<< HEAD
     'report',
-=======
     'member',
->>>>>>> 6cb8f33e07c39631497055c169e16b66130e76b1
+    'board',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PACKAGE_APPS + PROJECT_APPS

@@ -2,6 +2,7 @@ from celery import Task
 from server.celery import app
 from push.containers import PushContainer
 import logging
+from utils.exceptions import FCMSendException
 
 class RetryTask(Task):
     acks_late = True
@@ -27,8 +28,7 @@ def send_push_notification_handler(
             if resp.success:
                 logging.info(f'Successfully sent message: {resp.message_id}')
             else:
-                logging.error(f'FCM 전송 에러: {resp.exception}')
-                self.retry(countdown=5**self.request.retries)
+                raise FCMSendException
 
     except Exception as e:
         logging.error(f'send_menu_push_notification_beat 에러: {e}')

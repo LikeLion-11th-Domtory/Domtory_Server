@@ -32,3 +32,7 @@ class SigninResponseSerializer(serializers.Serializer):
     accessToken = serializers.CharField(source='access_token')
     refreshToken = serializers.CharField(source='refresh_token')
     member = _MemberResponseSerializer()
+
+class PasswordChangeRequestSerializer(serializers.Serializer):
+    oldPassword = serializers.CharField(source='old_password', error_messages=ERROR_MESSAGE)
+    newPassword = serializers.CharField(validators=[validate_password], error_messages=ERROR_MESSAGE, source='new_password')

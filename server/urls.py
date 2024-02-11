@@ -44,6 +44,7 @@ urlpatterns = [
     path('menu/', include('menu.urls')),
     path('member/', include('member.urls')),
     path('report/', include('report.urls')),
+    path('board/', include('board.urls')),
 ]
 
 urlpatterns += [

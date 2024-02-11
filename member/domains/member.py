@@ -17,7 +17,7 @@ class Member(AbstractBaseUser):
     nickname = models.CharField(unique=True, max_length=10)
     phone_number = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    birthday = models.CharField(max_length=255)
+    birthday = models.DateTimeField(max_length=255)
     dormitory_card = models.CharField(max_length=255)
     status = models.CharField(max_length=255, choices=MEMBER_STATUS_CHOICES, default='ADMIN_VERIFICATION_PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
