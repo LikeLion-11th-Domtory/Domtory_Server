@@ -34,9 +34,7 @@ class CreateReportView(APIView):
                 'table' : target_type,
                 'report_id' : serializer.data['id']
             }
-            response = requests.post('https://8ufbqa4zl8.execute-api.ap-northeast-2.amazonaws.com/prod', json=dataset)
-            print(response.content)
-            print(dataset)
+            requests.post('https://8ufbqa4zl8.execute-api.ap-northeast-2.amazonaws.com/prod', json=dataset)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
