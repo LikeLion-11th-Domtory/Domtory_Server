@@ -62,6 +62,7 @@ PROJECT_APPS = [
     'notice',
     'push',
     'menu',
+    'report',
     'member',
     'board',
 ]
@@ -144,7 +145,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

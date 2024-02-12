@@ -67,9 +67,9 @@ class PostCreateView(APIView):
                 post.save()
 
 
-class PostUpdateDeleteView(APIView):
+class PostUpdateView(APIView):
     """
-    게시글 수정 및 삭제 뷰
+    게시글 수정 뷰
     """
     authentication_classes = [JWTAuthentication]
     serializer_class = PostRequestSerializer
@@ -78,13 +78,70 @@ class PostUpdateDeleteView(APIView):
     def put(self, request, post_id):
         post = get_object_or_404(Post, pk = post_id)
         self.check_object_permissions(request, post)
-        serializer = PostRequestSerializer(post, data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        post_serializer = PostRequestSerializer(post, data = request.data)
+        image_serializer = ImageRequestSerializer(data = request.data)
+        if not post_serializer.is_valid():
+            {
+                "msg" : "유효하지 않은 게시글 형식"
+            }
+        if not image_serializer.is_valid():
+            {
+                "msg" : "유효하지 않은 이미지 형식"
+            }
         
+        deleted_images = request.data['deleted_images']
+        if deleted_images:
+            PostImage.objects.filter(id__in=deleted_images).delete()
+
+        image_data = image_serializer.validated_data
+        image_list = image_data.get('images')
+        if image_list:
+            try:
+                self.upload_image(post, image_list)
+                first_image = post.post_image.first()
+                if first_image:
+                    post.thumbnail_url = first_image.image_url
+                else:
+                    post.thumbnail_url = None
+                post.save()
+                return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
+            except:
+
+                res = {
+                    "msg" : "이미지 업로드 실패"
+                }
+                return Response(res, status = status.HTTP_400_BAD_REQUEST)
+        first_image = post.post_image.first()
+        if first_image:
+            post.thumbnail_url = first_image.image_url
+        else:
+            post.thumbnail_url = None
+        post.save()
+        return Response(PostResponseSerializer(post).data, status = status.HTTP_200_OK)
+        
+
+    def upload_image(self, post, image_list):
+        s3 = S3Connect()
+        for i in range(0, len(image_list)):
+            image = Image.open(image_list[i])
+            image = image.convert('RGB')
+
+            image.thumbnail((2000, 2000))
+            buffer = BytesIO()
+            image.save(buffer, format = 'JPEG', quality = 80)
+            image_data = buffer.getvalue()
+
+            key = f"{post.board.name}_{post.pk}_{uuid.uuid4().hex}.jpeg"
+            image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
+            
+            PostImage(post = post, image_url = image_url).save()
+
+class PostDeleteView(APIView):
+    """
+    게시글 삭제 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsOwnerOrReadOnly]
     def delete(self, request, post_id):
         post = get_object_or_404(Post, pk = post_id)
         post.is_deleted = True
@@ -92,7 +149,7 @@ class PostUpdateDeleteView(APIView):
         res = {
             "msg" : "게시글 삭제 완료"
         }
-        return Response(res, status = status.HTTP_201_CREATED)
+        return Response(res, status = status.HTTP_204_NO_CONTENT)
 
 
 class PostDetailView(APIView):
