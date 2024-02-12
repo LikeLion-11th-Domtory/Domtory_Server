@@ -12,14 +12,10 @@ class ReportAdmin(admin.ModelAdmin):
             if obj.post:
                 if obj.status == Report.ReportType.VALID:
                     obj.post.is_blocked = True
-                elif obj.status == Report.ReportType.INVALID:
-                    obj.post.is_blocked = False
                 obj.post.save()
             if obj.comment:
                 if obj.status == Report.ReportType.VALID:
                     obj.comment.is_blocked = True
-                elif obj.status == Report.ReportType.INVALID:
-                    obj.comment.is_blocked = False
                 obj.comment.save()
 
         super().save_model(request, obj, form, change)
