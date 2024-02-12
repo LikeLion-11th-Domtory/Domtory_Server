@@ -13,7 +13,7 @@ class S3Connect:
         object_name = f"{name}.{image_data.content_type.split('/')[-1]}"
         return '학사카드/' + object_name
     
-    def upload_to_s3(self, image_data, key, content_type: None):
+    def upload_to_s3(self, image_data, key, content_type=None):
         if content_type:
             self._s3_conn.put_object(Body=image_data, Bucket=self._bucket_name, Key=key, ContentType=content_type)
         else:
