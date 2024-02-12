@@ -26,10 +26,8 @@ def send_push_notification_handler(
 
         for idx, resp in enumerate(response.responses):
             if resp.success:
-                logging.info(f'Successfully sent message: {resp.message_id}')
+                logging.info(f'Successfully sent {event} message: {resp.message_id}')
             else:
                 raise FCMSendException
-
     except Exception as e:
         logging.error(f'send_menu_push_notification_beat 에러: {e}')
-        self.retry(countdown=5**self.request.retries)
