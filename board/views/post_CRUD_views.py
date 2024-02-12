@@ -91,8 +91,7 @@ class PostUpdateView(APIView):
         
         deleted_images = request.data['deleted_images']
         if deleted_images:
-            for img_id in deleted_images:
-                get_object_or_404(PostImage, pk = img_id).delete()
+            PostImage.objects.filter(id__in=deleted_images).delete()
 
         image_data = image_serializer.validated_data
         image_list = image_data.get('images')
