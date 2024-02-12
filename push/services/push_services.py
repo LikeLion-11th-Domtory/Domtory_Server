@@ -1,5 +1,6 @@
 from push.serializers import TokenRequestSerializer
 from push.domains import PushRepository
+from board.repositories import BoardRepository
 from firebase_admin import messaging
 from datetime import datetime
 from django.shortcuts import get_list_or_404
@@ -7,8 +8,9 @@ from menu.models import Menu
 from push.domains.device import Device
 
 class PushService:
-    def __init__(self, push_repository: PushRepository):
+    def __init__(self, push_repository: PushRepository, board_repository: BoardRepository):
         self._push_repository = push_repository
+        self._board_repository = board_repository
 
     def send_push_token(self, request_data: dict, request_user: Menu):
         token_send_request_serializer = TokenRequestSerializer(data=request_data)
@@ -22,7 +24,7 @@ class PushService:
         self._push_repository.save_device(device)
     
     def make_menu_push_notification_message(self, event, timezone: str):
-        valid_devices = self._push_repository.find_all_valid_device()
+        valid_devices = self._push_repository.find_all_devices()
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         menu_string_set, title = self._get_menu_data_set_and_message_title(timezone)
 
@@ -53,30 +55,22 @@ class PushService:
             event: str,
             comment_id: int
         ):
-        # from django.db.models import Q
-        # comment = get_object_or_404(Comment.objects.select_related('post__member', 'parent__member'), id=comment_id)
-        # if not comment.parent_id: # 만약 코멘트가 댓글이면
-        #     member = comment.post.member
-        #     devices = Device.objects.filter(member_id=member.id)
-        #     device_tokens = [device.device.token for device in devices]
-        #     title = '🐿️ 새로운 댓글이 달렸어요.'
-
-        # else: # 만약 코멘트가 대댓글이면
-        #     comments = Comment.objects.filter(parent_id=comment.parent_id).select_related('member')
-        #     member_ids = [comment.member.id for comment in comments]
-        #     devices = Device.objects.filter(Q(member_id=comment.post.member.id) | Q(member_id=comment.parent.member.id) | Q(member_id__in=member_ids))
-        #     device_tokens = [device.device_token for device in devices]
-        #     title = '🐿️ 새로운 대댓글이 달렸어요.'
-
-        # message = messaging.MulticastMessage(
-        #     notification = messaging.Notification(
-        #     title=f'🐿️ 돔토리 {title}식단 알리미',
-        #     body=comment.body
-        # ),
-        #     tokens=device_tokens,
-        # )
-        # return message
-        pass
+        comment = self._board_repository.find_comment_by_comment_id_with_post_and_parent(comment_id)
+        if not comment.parent: # 댓글일 때
+            device_tokens = self._find_device_tokens_when_comment(comment)
+            title = '🐿️ 새로운 댓글이 달렸어요.'
+        else: # 대댓글일 때
+            device_tokens = self._find_device_tokens_when_reply(comment)
+            title = '🐿️ 새로운 대댓글이 달렸어요.'
+        print(title, comment, device_tokens)
+        message = messaging.MulticastMessage(
+            notification = messaging.Notification(
+            title=title,
+            body=comment.body
+        ),
+            tokens=device_tokens,
+        )
+        return message
 
     def _make_today_date_code(self):
         now = datetime.now()
@@ -104,3 +98,25 @@ class PushService:
     
         title = title_mapping.get(timezone)
         return menu_string_set, title
+    
+    def _find_device_tokens_when_comment(self, comment):
+        member_id = comment.post.member_id
+        devices = self._push_repository.find_devices_by_member_id(member_id)
+        if comment.member_id == comment.post.member_id:
+            return []
+        return list(set(device.device_token for device in devices))
+    
+    def _find_device_tokens_when_reply(self, comment):
+        same_parent_comments = self._board_repository.find_comments_by_parent_with_member(comment.parent)
+        member_ids = [
+            same_parent_comment.member_id
+            for same_parent_comment in same_parent_comments
+            if same_parent_comment.member_id != comment.member_id # 부모가 같은 대댓글 중 본인에게는 알림이 가지 않게
+        ]
+        member_ids += [
+            member_id
+            for member_id in (comment.post.member_id, comment.parent.member_id)
+            if member_id != comment.member_id
+        ] # 본인의 댓글에 대댓글을 달거나 본인의 글에 있는 댓글에 대댓글을 달 때를 알림이 가지 않게
+        devices = self._push_repository.find_devices_by_member_ids(member_ids)
+        return list(set(device.device_token for device in devices))
