@@ -8,6 +8,7 @@ from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
 from ..permissions import IsOwnerOrReadOnly
+from push.tasks import send_push_notification_handler
 
 class CommentCreateView(APIView):
     """
@@ -20,7 +21,8 @@ class CommentCreateView(APIView):
         post = get_object_or_404(Post, pk = post_id)
         serializer = CommentRequestSerializer(data = request.data)
         if serializer.is_valid():
-            serializer.save(post = post, member = request.user)
+            comment = serializer.save(post = post, member = request.user)
+            send_push_notification_handler.delay('comment-notification-event', None, comment.id)
             return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         
@@ -58,7 +60,7 @@ class ReplyCreateView(APIView):
         if serializer.is_valid():
             reply = serializer.save(parent = comment, post = post, member = request.user)
             post = reply.parent.post
-            
+            send_push_notification_handler.delay('comment-notification-event', None, reply.id)
             return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
     
