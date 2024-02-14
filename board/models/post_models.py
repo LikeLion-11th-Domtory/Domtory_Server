@@ -11,6 +11,7 @@ class Post(models.Model):
     title = models.CharField(max_length = 90, null = False) # 한글 30글자
     body = models.TextField(default = "")
     created_at = models.DateTimeField(auto_now_add = True)
+    comment_cnt = models.IntegerField(default = 0)
     is_blocked = models.BooleanField(default = False)
     is_deleted = models.BooleanField(default = False)
     thumbnail_url = models.CharField(null = True, max_length = 255)

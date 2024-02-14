@@ -49,7 +49,7 @@ class PostSimpleSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id', 'member', 'status', 'title', 'thumbnail_url', 'created_at']
+        fields = ['id', 'member', 'status', 'title', 'comment_cnt' 'thumbnail_url', 'created_at']
 
     def get_status(self, obj):
         return obj.member.status
