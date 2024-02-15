@@ -1,2 +1,2 @@
-from .domains import Member, DormitoryPersonalInfo
+from .domains import Member, DormitoryPersonalInfo, PersonalInfoExcelFile
 # Create your models here.
