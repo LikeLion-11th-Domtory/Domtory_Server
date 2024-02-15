@@ -22,6 +22,8 @@ class CommentCreateView(APIView):
         serializer = CommentRequestSerializer(data = request.data)
         if serializer.is_valid():
             comment = serializer.save(post = post, member = request.user)
+            post.comment_cnt += 1
+            post.save()
             send_push_notification_handler.delay('comment-notification-event', None, comment.id)
             return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -41,6 +43,8 @@ class CommentDeleteView(APIView):
 
         comment.is_deleted = True
         comment.save()
+        post.comment_cnt -= 1
+        post.save()
 
         return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
 
@@ -59,7 +63,8 @@ class ReplyCreateView(APIView):
         serializer = ReplyRequestSerializer(data = request.data)
         if serializer.is_valid():
             reply = serializer.save(parent = comment, post = post, member = request.user)
-            post = reply.parent.post
+            post.comment_cnt += 1
+            post.save()
             send_push_notification_handler.delay('comment-notification-event', None, reply.id)
             return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -79,5 +84,7 @@ class ReplyDeleteView(APIView):
 
         reply.is_deleted = True
         reply.save()
+        post.comment_cnt -= 1
+        post.save()
         return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
         
