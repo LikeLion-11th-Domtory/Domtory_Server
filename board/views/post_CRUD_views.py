@@ -24,6 +24,11 @@ class PostCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, board_id):
+        if board_id == 6:
+            res = {
+                "detail": "자율회 게시글 작성 API를 사용해주세요."
+            }
+            return Response(res, status=status.HTTP_403_FORBIDDEN)
         board = Board.objects.get(pk = board_id)
         serializer = PostRequestSerializer(data = request.data)
         if serializer.is_valid():
@@ -57,7 +62,7 @@ class PostCreateView(APIView):
             image.save(buffer, format = 'JPEG', quality = 80)
             image_data = buffer.getvalue()
 
-            key = f"{post.board.name}_{post.pk}_{uuid.uuid4().hex}.jpeg"
+            key = f"{post.board.name}/{post.pk}_{uuid.uuid4().hex}.jpeg"
             image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
             
             PostImage(post = post, image_url = image_url).save()
@@ -131,7 +136,7 @@ class PostUpdateView(APIView):
             image.save(buffer, format = 'JPEG', quality = 80)
             image_data = buffer.getvalue()
 
-            key = f"{post.board.name}_{post.pk}_{uuid.uuid4().hex}.jpeg"
+            key = f"{post.board.name}/{post.pk}_{uuid.uuid4().hex}.jpeg"
             image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
             
             PostImage(post = post, image_url = image_url).save()
