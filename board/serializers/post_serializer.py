@@ -26,14 +26,14 @@ class PostRequestSerializer(serializers.ModelSerializer):
 class PostResponseSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     post_image = PostImageSerializer(many = True)
-    comment = CommentResponseSerializer(many = True)
+    comment = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = Post
         fields = '__all__'
 
     def get_comment(self, obj):
-        comments = obj.comment.filter(parent__isnull=True)
+        comments = obj.comment.filter(parent = None)
         serializer = CommentResponseSerializer(comments, many=True).data
         return serializer
     
