@@ -24,6 +24,11 @@ class PostCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, board_id):
+        if board_id == 6:
+            res = {
+                "detail": "자율회 게시글 작성 API를 사용해주세요."
+            }
+            return Response(res, status=status.HTTP_403_FORBIDDEN)
         board = Board.objects.get(pk = board_id)
         serializer = PostRequestSerializer(data = request.data)
         if serializer.is_valid():
