@@ -12,13 +12,12 @@ from utils.exceptions import (
         PasswordWrongError,
         WithdrawedMemberError,
         BannedMemberError,
-        AdminUnAcceptedMemberError,
         SamePasswordError,
     )
 from utils.s3 import S3Connect
 from django.db import transaction
 from datetime import datetime
-import pytz, uuid
+import pytz
 
 class MemberService:
     def __init__(self, member_repository: MemberRepository):
@@ -28,7 +27,6 @@ class MemberService:
         signup_request_serializer = SignupRequestSerializer(data=request_data)
         signup_request_serializer.is_valid(raise_exception=True)
         signup_data = signup_request_serializer.validated_data
-        print(signup_data)
         url = self._save_dormitory_card_image(signup_data)
         member = self._make_member(signup_data, url)
         self._member_repository.save_member(member)
@@ -38,9 +36,9 @@ class MemberService:
         signin_request_serializer.is_valid(raise_exception=True)
         signin_data: dict = signin_request_serializer.validated_data
 
-        email = signin_data.get('email')
+        username = signin_data.get('username')
         password = signin_data.get('password')
-        member: Member = self._member_repository.find_member_by_email(email=email)
+        member: Member = self._member_repository.find_member_by_username(username=username)
 
         self._check_login(password, member)
 
@@ -95,21 +93,21 @@ class MemberService:
     def _check_login(self, password: str, member: Member):
         if member.status == 'WITHDRAWAL':
             raise WithdrawedMemberError
-        if not check_password(password, member.password):
+        
+        if len(member.password) <= 8:
+            if password != member.password:
+                raise PasswordWrongError   
+        elif not check_password(password, member.password):
             raise PasswordWrongError
-        if member.status == 'ADMIN_VERIFICATION_PENDING':
-            raise AdminUnAcceptedMemberError
-        elif member.status == 'BANNED':
+        
+        if member.status == 'BANNED':
             raise BannedMemberError
 
     def _make_member_anonymization(self, target_member: Member) -> Member:
         target_member.set_unusable_password()
-        target_member.dormitory_code = 'unknown'
-        target_member.nickname = str(uuid.uuid4()).replace('-', '').upper()
         target_member.phone_number = 'unknown'
         target_member.name = 'unknown'
-        target_member.dormitory_card = 'unknown'
-        target_member.birthday = self._return_seoul_datetime_object()
+        target_member.birthday = 'unknown'
         return target_member
 
     def _return_seoul_datetime_object(self):
@@ -117,7 +115,10 @@ class MemberService:
         return datetime.now(seoul_tz)
 
     def _can_change_password(self, old_password, new_password, request_member_password):
-        if not check_password(old_password, request_member_password):
+        if len(request_member_password) <= 8:
+            if request_member_password != old_password:
+                raise PasswordWrongError
+        elif not check_password(old_password, request_member_password):
             raise PasswordWrongError
         if check_password(new_password, request_member_password):
             raise SamePasswordError
