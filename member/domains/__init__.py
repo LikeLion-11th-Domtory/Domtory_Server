@@ -1,2 +1,4 @@
 from .member import Member
+from .dormitory_personal_info import DormitoryPersonalInfo
 from .member_repository import MemberRepository
+from .personal_info_excel_file import PersonalInfoExcelFile
