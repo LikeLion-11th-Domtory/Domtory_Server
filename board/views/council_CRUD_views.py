@@ -25,6 +25,8 @@ class CouncilPostCreateView(APIView):
         serializer = PostRequestSerializer(data = request.data)
         if serializer.is_valid():
             post = serializer.save(member = request.user, board = board)
+            if 'images' not in request.data:
+                return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
 
             image_request_serializer = ImageRequestSerializer(data = request.data)
             image_request_serializer.is_valid(raise_exception=True)
