@@ -25,4 +25,4 @@ class PostSearchView(APIView):
             posts = Post.objects.filter(Q(board = board_id) & query)
         else: # 전체 게시판에 대하여 검색 시
             posts = Post.objects.filter(query)
-        return Response(PostResponseSerializer(posts, many = True).data)
+        return Response(PostSimpleSerializer(posts, many = True).data)

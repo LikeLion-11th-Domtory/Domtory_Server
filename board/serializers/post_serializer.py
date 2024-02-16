@@ -28,6 +28,7 @@ class PostResponseSerializer(serializers.ModelSerializer):
     post_image = PostImageSerializer(many = True)
     comment = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
     class Meta:
         model = Post
         fields = '__all__'
@@ -42,6 +43,12 @@ class PostResponseSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj):
         return obj.created_at.strftime('%m/%d %H:%M')
+    
+    def get_owner(self, obj):
+        request = self.context.get('request')
+        if request:
+            if request.user == obj.member: return True
+        return False
 
 
 class PostSimpleSerializer(serializers.ModelSerializer):

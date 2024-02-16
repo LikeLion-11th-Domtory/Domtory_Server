@@ -26,7 +26,7 @@ class CouncilPostCreateView(APIView):
         if serializer.is_valid():
             post = serializer.save(member = request.user, board = board)
             if 'images' not in request.data:
-                return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+                return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
 
             image_request_serializer = ImageRequestSerializer(data = request.data)
             image_request_serializer.is_valid(raise_exception=True)
@@ -35,14 +35,14 @@ class CouncilPostCreateView(APIView):
             if image_list:
                 try:
                     self.upload_image(post, image_list)
-                    return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+                    return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
                 except:
                     post.delete()
                     res = {
                         "msg" : "이미지 업로드 실패"
                     }
                     return Response(res, status = status.HTTP_400_BAD_REQUEST)
-            return Response(PostResponseSerializer(post).data, status = status.HTTP_201_CREATED)
+            return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def upload_image(self, post, image_list):
