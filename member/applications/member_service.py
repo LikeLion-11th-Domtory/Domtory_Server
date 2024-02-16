@@ -12,12 +12,13 @@ from utils.exceptions import (
         PasswordWrongError,
         WithdrawedMemberError,
         BannedMemberError,
+        AdminUnAcceptedMemberError,
         SamePasswordError,
     )
 from utils.s3 import S3Connect
 from django.db import transaction
 from datetime import datetime
-import pytz
+import pytz, uuid
 
 class MemberService:
     def __init__(self, member_repository: MemberRepository):
@@ -27,6 +28,7 @@ class MemberService:
         signup_request_serializer = SignupRequestSerializer(data=request_data)
         signup_request_serializer.is_valid(raise_exception=True)
         signup_data = signup_request_serializer.validated_data
+        print(signup_data)
         url = self._save_dormitory_card_image(signup_data)
         member = self._make_member(signup_data, url)
         self._member_repository.save_member(member)
@@ -36,9 +38,9 @@ class MemberService:
         signin_request_serializer.is_valid(raise_exception=True)
         signin_data: dict = signin_request_serializer.validated_data
 
-        username = signin_data.get('username')
+        email = signin_data.get('email')
         password = signin_data.get('password')
-        member: Member = self._member_repository.find_member_by_username(username=username)
+        member: Member = self._member_repository.find_member_by_email(email=email)
 
         self._check_login(password, member)
 
@@ -95,14 +97,19 @@ class MemberService:
             raise WithdrawedMemberError
         if not check_password(password, member.password):
             raise PasswordWrongError
+        if member.status == 'ADMIN_VERIFICATION_PENDING':
+            raise AdminUnAcceptedMemberError
         elif member.status == 'BANNED':
             raise BannedMemberError
 
     def _make_member_anonymization(self, target_member: Member) -> Member:
         target_member.set_unusable_password()
+        target_member.dormitory_code = 'unknown'
+        target_member.nickname = str(uuid.uuid4()).replace('-', '').upper()
         target_member.phone_number = 'unknown'
         target_member.name = 'unknown'
-        target_member.birthday = 'unknown'
+        target_member.dormitory_card = 'unknown'
+        target_member.birthday = self._return_seoul_datetime_object()
         return target_member
 
     def _return_seoul_datetime_object(self):

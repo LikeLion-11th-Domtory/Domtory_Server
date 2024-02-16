@@ -10,11 +10,14 @@ class MemberTestCase(TestCase):
         self.client = Client()
         self.signin_url = reverse('member:signin')
         self.member = Member(
-            username="testuser",
+            email="useruser@example.com",
             password=make_password("!123testtest"),
-            name="테스트",
+            name="test",
             phone_number="01000000000",
-            birthday="20190102",
+            nickname="닉네임",
+            birthday="2019-08-24T14:15:22Z",
+            dormitory_code="testcode",
+            dormitory_card='url.com',
             status="ACTIVE"
         )
         self.member.save()
@@ -23,7 +26,7 @@ class MemberTestCase(TestCase):
         
     def test_signin(self):
         signin_request_data = {
-            "username": "testuser",
+            "email": "useruser@example.com",
             "password": "!123testtest"
         }
         response = self.client.post(self.signin_url, signin_request_data)

@@ -17,16 +17,16 @@ class SignupRequestSerializer(serializers.ModelSerializer):
         fields = ('email', 'password', 'name', 'phoneNumber', 'nickname', 'birthday', 'dormitoryCode', 'dormitoryCard')
     
 class SigninRequestSerialzier(serializers.ModelSerializer):
-    username = serializers.CharField(validators=[])
+    email = serializers.EmailField(validators=[])
 
     class Meta:
         model = Member
-        fields = ('username', 'password')
+        fields = ('email', 'password')
 
 class _MemberResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('id', 'username',)
+        fields = ('id', 'email', 'nickname')
 
 class SigninResponseSerializer(serializers.Serializer):
     accessToken = serializers.CharField(source='access_token')
