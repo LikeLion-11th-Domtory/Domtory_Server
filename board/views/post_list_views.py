@@ -40,11 +40,8 @@ class PostListView(APIView):
         paginator = PostPageNumberPagination()
         page = paginator.paginate_queryset(posts, request)
 
-        if page is not None:
-            serializer = PostSimpleSerializer(page, many = True)
-            return paginator.get_paginated_response(serializer.data)
-        serializer = PostSimpleSerializer(posts)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        serializer = PostSimpleSerializer(page, many = True)
+        return paginator.get_paginated_response(serializer.data)
     
 
 class FreeBoardSimpleView(APIView):
