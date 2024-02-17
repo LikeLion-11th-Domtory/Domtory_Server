@@ -22,7 +22,7 @@ class PostSearchView(APIView):
             query |= Q(body__icontains=keyword) | Q(title__icontains=keyword)
 
         if board_id != 0: # 특정 게시판에 대하여 검색 시
-            posts = Post.objects.filter(Q(board = board_id) & query)
+            posts = Post.objects.filter(Q(board = board_id) & query).order_by('-created_at')
         else: # 전체 게시판에 대하여 검색 시
-            posts = Post.objects.filter(query)
+            posts = Post.objects.filter(query).order_by('-created_at')
         return Response(PostSimpleSerializer(posts, many = True).data)
