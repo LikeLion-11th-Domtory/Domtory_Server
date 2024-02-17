@@ -9,6 +9,7 @@ class NoticeList(models.Model):
     date = models.CharField(max_length=100)
     content = models.TextField(null=True)
     images = models.TextField(null=True)
+    notice_url = models.CharField(null = True, max_length = 255)
     
     def __str__(self):
         return self.title

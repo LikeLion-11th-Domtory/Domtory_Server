@@ -6,4 +6,4 @@ from .models import NoticeList
 class NoticeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoticeList
-        fields = ['id', 'post_id', 'title', 'date', 'content', 'images']
+        fields = ['id', 'post_id', 'title', 'date', 'content', 'images', 'notice_url']
