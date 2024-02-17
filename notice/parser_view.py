@@ -29,7 +29,8 @@ class CrawlDataView(APIView):
                     title=post['title'],
                     date=post['date'],
                     content=post['content'],
-                    images=post['images']).save()
+                    images=post['images'],
+                    notice_url=post['notice_url']).save()
 
         return Response(status=status.HTTP_200_OK)
 
@@ -93,6 +94,8 @@ class CrawlDataView(APIView):
                     post_data['images'] = img_src_absolute
                 else:
                     post_data['images'] = ''
+
+            post_data['notice_url'] = new_link
                 
 
             # Append post_data to the list
