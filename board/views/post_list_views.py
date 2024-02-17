@@ -6,6 +6,22 @@ from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
+from collections import OrderedDict
+
+
+class PostPageNumberPagination(PageNumberPagination):
+    """
+    페이지네이션 클래스
+    """
+    page_size = 10
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('pageCnt', self.page.paginator.num_pages),
+            ('curPage', self.page.number),
+            ('postList', data),
+        ]))
 
 
 class PostListView(APIView):
@@ -16,9 +32,18 @@ class PostListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, board_id):
-        posts = Post.objects.filter(board = board_id, is_blocked = False, is_deleted = False).order_by('-created_at')
-        serializer = PostSimpleSerializer(posts, many = True)
-        Board.objects.get(pk = board_id)
+        board = Board.objects.get(pk = board_id)
+        posts = board.post.filter(is_blocked = False, is_deleted = False).order_by('-created_at')
+        if board_id != 6:
+            serializer = PostSimpleSerializer(posts, many = True)
+            return Response(serializer.data, status = status.HTTP_200_OK)
+        paginator = PostPageNumberPagination()
+        page = paginator.paginate_queryset(posts, request)
+
+        if page is not None:
+            serializer = PostSimpleSerializer(page, many = True)
+            return paginator.get_paginated_response(serializer.data)
+        serializer = PostSimpleSerializer(posts)
         return Response(serializer.data, status = status.HTTP_200_OK)
     
 
