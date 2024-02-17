@@ -26,7 +26,7 @@ class SigninRequestSerialzier(serializers.ModelSerializer):
 class _MemberResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('id', 'username')
+        fields = ('id', 'username', 'name')
 
 class SigninResponseSerializer(serializers.Serializer):
     accessToken = serializers.CharField(source='access_token')
