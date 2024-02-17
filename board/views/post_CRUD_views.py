@@ -1,4 +1,3 @@
-from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,8 +11,6 @@ from PIL import Image
 from io import BytesIO
 from utils.s3 import S3Connect
 import uuid
-from django.core.files.uploadedfile import InMemoryUploadedFile
-import mimetypes
 
 
 class PostCreateView(APIView):
@@ -79,45 +76,41 @@ class PostUpdateView(APIView):
     게시글 수정 뷰
     """
     authentication_classes = [JWTAuthentication]
-    serializer_class = PostRequestSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
     def put(self, request, post_id):
         post = get_object_or_404(Post, pk = post_id)
         self.check_object_permissions(request, post)
-        post_serializer = PostRequestSerializer(post, data = request.data)
-        image_serializer = ImageRequestSerializer(data = request.data)
-        if not post_serializer.is_valid():
-            {
-                "msg" : "유효하지 않은 게시글 형식"
-            }
-        if not image_serializer.is_valid():
-            {
-                "msg" : "유효하지 않은 이미지 형식"
-            }
-        
-        deleted_images = request.data['deleted_images']
-        if deleted_images:
+        if 'title' in request.data:
+            post.title = request.data['title']
+        if 'body' in request.data:
+            post.body = request.data['body']
+        post.save()
+            
+        if 'deleted_images' in request.data:
+            deleted_images = request.data['deleted_images']
             PostImage.objects.filter(id__in=deleted_images).delete()
 
-        image_data = image_serializer.validated_data
-        image_list = image_data.get('images')
-        if image_list:
-            try:
-                self.upload_image(post, image_list)
-                first_image = post.post_image.first()
-                if first_image:
-                    post.thumbnail_url = first_image.image_url
-                else:
-                    post.thumbnail_url = None
-                post.save()
-                return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_200_OK)
-            except:
+        if 'images' in request.data:
+            image_serializer = ImageRequestSerializer(data = request.data)
+            image_serializer.is_valid(raise_exception = True)
+            image_data = image_serializer.validated_data
+            image_list = image_data.get('images')
+            if image_list:
+                try:
+                    self.upload_image(post, image_list)
+                    first_image = post.post_image.first()
+                    if first_image:
+                        post.thumbnail_url = first_image.image_url
+                    else:
+                        post.thumbnail_url = None
+                    post.save()
+                except:
 
-                res = {
-                    "msg" : "이미지 업로드 실패"
-                }
-                return Response(res, status = status.HTTP_400_BAD_REQUEST)
+                    res = {
+                        "msg" : "이미지 업로드 실패"
+                    }
+                    return Response(res, status = status.HTTP_400_BAD_REQUEST)
         first_image = post.post_image.first()
         if first_image:
             post.thumbnail_url = first_image.image_url
