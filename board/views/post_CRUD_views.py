@@ -78,7 +78,7 @@ class PostUpdateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
 
-    def put(self, request, post_id):
+    def patch(self, request, post_id):
         post = get_object_or_404(Post, pk = post_id)
         self.check_object_permissions(request, post)
         if 'title' in request.data:
