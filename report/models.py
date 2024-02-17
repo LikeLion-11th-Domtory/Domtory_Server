@@ -15,5 +15,13 @@ class Report(models.Model):
     post = models.ForeignKey(Post, null=True, blank=True, on_delete=models.SET_NULL)
     comment = models.ForeignKey(Comment, null=True, blank=True, on_delete=models.SET_NULL)
 
+    def __str__(self):
+        if self.post:
+            return f"게시글 신고 : {self.post.body}"
+        elif self.comment:
+            return f"댓글 신고 : {self.comment.body}"
+
     class Meta:
         db_table = 'report'
+
+
