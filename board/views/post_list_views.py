@@ -58,3 +58,22 @@ class FreeBoardSimpleView(APIView):
             latest_posts = Post.objects.exclude(Q(board__pk = 6)|Q(is_blocked = True)|Q(is_deleted = True)).order_by('-created_at')[:3]
         serializer = PostSimpleSerializer(latest_posts, many = True)
         return Response(serializer.data, status = status.HTTP_200_OK)
+    
+
+class MyArticlesView(APIView):
+    """
+    마이페이지에서 내가 쓴 게시글/댓글을 출력하는 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        posts = request.user.post.filter(is_deleted = False).order_by('-created_at')
+        comments = request.user.comment.filter(is_deleted = False).order_by('-created_at')
+        post_serializer = PostSimpleSerializer(posts, many = True)
+        comment_serializer = CommentMyPageSerializer(comments, many = True)
+        res = {
+            'posts' : post_serializer.data,
+            'comments' : comment_serializer.data
+        }
+        return Response(res, status = status.HTTP_200_OK)
