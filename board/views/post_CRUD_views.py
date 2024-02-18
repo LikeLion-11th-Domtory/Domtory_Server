@@ -88,8 +88,8 @@ class PostUpdateView(APIView):
         post.save()
             
         if 'deleted_images' in request.data:
-            deleted_images = request.data['deleted_images']
-            PostImage.objects.filter(id__in=deleted_images).delete()
+            deleted_images = request.data.getlist('deleted_images')
+            PostImage.objects.filter(id__in=map(int, deleted_images)).delete()
 
         if 'images' in request.data:
             image_serializer = ImageRequestSerializer(data = request.data)
