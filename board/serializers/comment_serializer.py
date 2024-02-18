@@ -32,3 +32,13 @@ class CommentResponseSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj):
         return obj.created_at.strftime('%m/%d %H:%M')
+    
+
+class CommentMyPageSerializer(serializers.ModelSerializer):
+    created_at = serializers.SerializerMethodField()
+    class Meta:
+        model = Comment
+        fields = ['id', 'member', 'post', 'body', 'created_at', 'is_blocked']
+
+    def get_created_at(self, obj):
+        return obj.created_at.strftime('%m/%d %H:%M')
