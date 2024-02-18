@@ -22,5 +22,6 @@ urlpatterns = [
     path('reply/delete/<int:reply_id>/', ReplyDeleteView.as_view()), # 대댓글 삭제
 
     # 마이페이지
-    path('my-article/', MyArticlesView.as_view()), # 내가 쓴 글과 댓글
+    path('mypage/post/', MyPostView.as_view()), # 내가 쓴 게시글
+    path('mypage/comment/', MyCommentView.as_view()), # 내가 댓글을 쓴 게시글
 ]
