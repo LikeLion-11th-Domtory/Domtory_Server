@@ -46,7 +46,7 @@ class CommentDeleteView(APIView):
         post.comment_cnt -= 1
         post.save()
 
-        return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
+        return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_204_NO_CONTENT)
 
 
 
@@ -86,5 +86,5 @@ class ReplyDeleteView(APIView):
         reply.save()
         post.comment_cnt -= 1
         post.save()
-        return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
+        return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_204_NO_CONTENT)
         
