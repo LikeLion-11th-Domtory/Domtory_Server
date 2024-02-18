@@ -60,20 +60,27 @@ class FreeBoardSimpleView(APIView):
         return Response(serializer.data, status = status.HTTP_200_OK)
     
 
-class MyArticlesView(APIView):
+class MyPostView(APIView):
     """
-    마이페이지에서 내가 쓴 게시글/댓글을 출력하는 뷰
+    마이페이지에서 내가 쓴 게시글을 출력하는 뷰
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        posts = request.user.post.filter(is_deleted = False).order_by('-created_at')
-        comments = request.user.comment.filter(is_deleted = False).order_by('-created_at')
-        post_serializer = PostSimpleSerializer(posts, many = True)
-        comment_serializer = CommentMyPageSerializer(comments, many = True)
-        res = {
-            'posts' : post_serializer.data,
-            'comments' : comment_serializer.data
-        }
-        return Response(res, status = status.HTTP_200_OK)
+        posts = request.user.post.filter(Q(is_deleted = False)&Q(is_blocked = False)).order_by('-created_at')
+        serializer = PostSimpleSerializer(posts, many = True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    
+
+class MyCommentView(APIView):
+    """
+    내가 댓글을 쓴 게시글들을 출력하는 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        posts = Post.objects.filter(comment__member=request.user, is_deleted=False, is_blocked=False).prefetch_related('comment__post').distinct().order_by('-created_at')
+        serializer = PostSimpleSerializer(posts, many = True)
+        return Response(serializer.data, status = status.HTTP_200_OK)

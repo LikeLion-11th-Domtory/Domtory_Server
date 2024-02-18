@@ -6,7 +6,7 @@ from ..serializers import *
 from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
-from ..permissions import IsOwnerOrReadOnly
+from ..permissions import IsStaffOrReadOnly
 from PIL import Image
 from io import BytesIO
 from utils.s3 import S3Connect
@@ -18,7 +18,7 @@ class CouncilPostCreateView(APIView):
     자율회 게시글 작성 뷰
     """
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsStaffOrReadOnly]
 
     def post(self, request):
         board = Board.objects.get(pk = 6)

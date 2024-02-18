@@ -7,3 +7,12 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         return obj.member == request.user
+
+
+class IsStaffOrReadOnly(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return request.user and request.user.is_staff
