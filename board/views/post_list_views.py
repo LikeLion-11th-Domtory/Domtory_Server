@@ -81,6 +81,6 @@ class MyCommentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        posts = Post.objects.filter(Q(comment__member = request.user)&Q(is_deleted = False)&Q(is_blocked = False)).distinct().order_by('-created_at')
+        posts = Post.objects.filter(comment__member=request.user, is_deleted=False, is_blocked=False).prefetch_related('comment_post').distinct().order_by('-created_at')
         serializer = PostSimpleSerializer(posts, many = True)
         return Response(serializer.data, status = status.HTTP_200_OK)
