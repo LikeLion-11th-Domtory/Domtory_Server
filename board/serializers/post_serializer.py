@@ -42,13 +42,33 @@ class PostResponseSerializer(serializers.ModelSerializer):
         return obj.member.status
 
     def get_created_at(self, obj):
-        return obj.created_at.strftime('%m/%d %H:%M')
+        if obj.board.pk != 6:
+            time_difference = timezone.now() - obj.created_at
+            minutes = time_difference.total_seconds() / 60
+
+            if time_difference <= timedelta(hours=1):
+                # 1시간 이내인 경우
+                return f'{int(minutes)}분 전'
+            elif obj.created_at.date() == timezone.now().date():
+                # 같은 날(오늘)인 경우
+                return obj.created_at.strftime('%H:%M')
+            else:
+                # 이전 날짜인 경우
+                return obj.created_at.strftime('%m/%d')
+        else:
+            return obj.created_at.strftime('%Y-%m-%d')
     
     def get_owner(self, obj):
         request = self.context.get('request')
         if request:
             if request.user == obj.member: return True
         return False
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.board.pk == 6:
+            representation['date'] = representation.pop('created_at')
+        return representation
 
 
 class PostSimpleSerializer(serializers.ModelSerializer):
@@ -56,21 +76,29 @@ class PostSimpleSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id', 'member', 'board', 'status', 'title', 'comment_cnt', 'thumbnail_url', 'created_at']
+        fields = ['id', 'member', 'board', 'status', 'title', 'body', 'comment_cnt', 'thumbnail_url', 'created_at']
 
     def get_status(self, obj):
         return obj.member.status
     
     def get_created_at(self, obj):
-        time_difference = timezone.now() - obj.created_at
-        minutes = time_difference.total_seconds() / 60
+        if obj.board.pk != 6:
+            time_difference = timezone.now() - obj.created_at
+            minutes = time_difference.total_seconds() / 60
 
-        if time_difference <= timedelta(hours=1):
-            # 1시간 이내인 경우
-            return f'{int(minutes)}분 전'
-        elif obj.created_at.date() == timezone.now().date():
-            # 같은 날(오늘)인 경우
-            return obj.created_at.strftime('%H시 %M분')
-        else:
-            # 이전 날짜인 경우
-            return obj.created_at.strftime('%m/%d')
+            if time_difference <= timedelta(hours=1):
+                # 1시간 이내인 경우
+                return f'{int(minutes)}분 전'
+            elif obj.created_at.date() == timezone.now().date():
+                # 같은 날(오늘)인 경우
+                return obj.created_at.strftime('%H:%M')
+            else:
+                # 이전 날짜인 경우
+                return obj.created_at.strftime('%m/%d')
+        return obj.created_at.strftime('%Y-%m-%d')
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.board.pk == 6:
+            representation['date'] = representation.pop('created_at')
+        return representation
