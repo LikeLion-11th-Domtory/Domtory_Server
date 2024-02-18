@@ -58,10 +58,10 @@ class PushService:
         comment = self._board_repository.find_comment_by_comment_id_with_post_and_parent(comment_id)
         if not comment.parent: # 댓글일 때
             device_tokens = self._find_device_tokens_when_comment(comment)
-            title = '🐿️ 새로운 댓글이 달렸어요.'
+            title = f'🐿️ \'{comment.post.title}\'글에 새로운 댓글이 달렸어요.'
         else: # 대댓글일 때
             device_tokens = self._find_device_tokens_when_reply(comment)
-            title = '🐿️ 새로운 대댓글이 달렸어요.'
+            title = f'🐿️ \'{comment.post.title}\'글에 새로운 대댓글이 달렸어요.'
 
         message = messaging.MulticastMessage(
             notification = messaging.Notification(
