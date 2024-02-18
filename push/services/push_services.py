@@ -62,13 +62,17 @@ class PushService:
         else: # 대댓글일 때
             device_tokens = self._find_device_tokens_when_reply(comment)
             title = '🐿️ 새로운 대댓글이 달렸어요.'
-        print(title, comment, device_tokens)
+
         message = messaging.MulticastMessage(
             notification = messaging.Notification(
             title=title,
             body=comment.body
         ),
-            tokens=device_tokens,
+        data={
+            'postId': str(comment.post_id),
+            'boardId': str(comment.post.board_id)
+        },
+        tokens=device_tokens,
         )
         return message
 
