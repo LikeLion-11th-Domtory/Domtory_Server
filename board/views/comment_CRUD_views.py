@@ -18,10 +18,29 @@ class CommentCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, post_id):
-        post = get_object_or_404(Post, pk = post_id)
+        post = Post.objects.prefetch_related('comment').get(pk = post_id)
+
+        comments = post.comment.all()
+        anonymous_number = 0
+
+        if request.user != post.member:
+            flag = False
+
+            for comment in comments:
+                if comment.member == request.user:
+                    anonymous_number = comment.anonymous_number
+                    flag = True
+                    break
+                if anonymous_number < comment.anonymous_number:
+                    anonymous_number = comment.anonymous_number
+
+            if flag == False:
+                anonymous_number += 1
+
+        
         serializer = CommentRequestSerializer(data = request.data)
         if serializer.is_valid():
-            comment = serializer.save(post = post, member = request.user)
+            comment = serializer.save(post = post, member = request.user, anonymous_number = anonymous_number)
             post.comment_cnt += 1
             post.save()
             send_push_notification_handler.delay('comment-notification-event', None, comment.id)
@@ -58,11 +77,29 @@ class ReplyCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, comment_id):
-        comment = get_object_or_404(Comment, pk = comment_id)
-        post = comment.post
+        parent = get_object_or_404(Comment, pk = comment_id)
+        post = parent.post
+
+        comments = post.comment.all()
+        anonymous_number = 0
+
+        if request.user != post.member:
+            flag = False
+
+            for comment in comments:
+                if comment.member == request.user:
+                    anonymous_number = comment.anonymous_number
+                    flag = True
+                    break
+                if anonymous_number < comment.anonymous_number:
+                    anonymous_number = comment.anonymous_number
+
+            if flag == False:
+                anonymous_number += 1
+
         serializer = ReplyRequestSerializer(data = request.data)
         if serializer.is_valid():
-            reply = serializer.save(parent = comment, post = post, member = request.user)
+            reply = serializer.save(parent = parent, post = post, member = request.user, anonymous_number = anonymous_number)
             post.comment_cnt += 1
             post.save()
             send_push_notification_handler.delay('comment-notification-event', None, reply.id)
