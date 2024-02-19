@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from utils.member_manager import MemberManager
 
-class Member(AbstractBaseUser):
+class Member(AbstractBaseUser, PermissionsMixin):
     objects = MemberManager()
     MEMBER_STATUS_CHOICES = (
         ('ACTIVE','활동'),
@@ -21,12 +21,6 @@ class Member(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
-
-    def has_perm(self, perm, obj=None):
-        return True
-
-    def has_module_perms(self, app_label):
-        return True
     
     class Meta:
         db_table = 'member'
