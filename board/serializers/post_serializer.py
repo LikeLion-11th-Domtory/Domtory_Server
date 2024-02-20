@@ -85,6 +85,7 @@ class PostSimpleSerializer(serializers.ModelSerializer):
         return obj.member.status
     
     def get_created_at(self, obj):
+        post_time = timezone.localtime(obj.created_at)
         if obj.board.pk != 6:
             time_difference = timezone.now() - obj.created_at
             minutes = time_difference.total_seconds() / 60
@@ -92,13 +93,16 @@ class PostSimpleSerializer(serializers.ModelSerializer):
             if time_difference <= timedelta(hours=1):
                 # 1시간 이내인 경우
                 return f'{int(minutes)}분 전'
-            elif obj.created_at.date() == timezone.now().date():
+            elif post_time.date() == timezone.localtime(timezone.now()).date():
                 # 같은 날(오늘)인 경우
-                return obj.created_at.strftime('%H:%M')
+                return post_time.strftime('%H:%M')
             else:
                 # 이전 날짜인 경우
-                return obj.created_at.strftime('%m/%d')
-        return obj.created_at.strftime('%Y-%m-%d')
+                print(obj.created_at)
+                print(timezone.now())
+                return post_time.strftime('%m/%d')
+        else:
+            return post_time.strftime('%Y-%m-%d')
         
     def to_representation(self, instance):
         representation = super().to_representation(instance)
