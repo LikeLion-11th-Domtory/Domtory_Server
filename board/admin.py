@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import *
-from member.domains.member import Member
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 # Register your models here.
 
@@ -24,12 +24,16 @@ class BoardAdmin(admin.ModelAdmin):
     
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'get_member_name', 'board')
+    list_display = ('title', 'get_member_name', 'board', 'get_created_at')
     list_filter = (BoardFilter,)
 
     def get_member_name(self, obj):
         return obj.member.name
     get_member_name.short_description = '작성자'
+
+    def get_created_at(self, obj):
+        return timezone.localtime(obj.created_at)
+    get_created_at.short_description = '작성 시각'
 
 
 class PostImageAdmin(admin.ModelAdmin):
@@ -42,12 +46,16 @@ class PostImageAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('body', 'get_member_name', 'post')
+    list_display = ('body', 'get_member_name', 'post', 'get_created_at')
     list_filter = (BoardFilter,)
 
     def get_member_name(self, obj):
         return obj.post.member.name
     get_member_name.short_description = '작성자'
+
+    def get_created_at(self, obj):
+        return timezone.localtime(obj.created_at)
+    get_created_at.short_description = '작성 시각'
 
 
 admin.site.register(Board, BoardAdmin)
