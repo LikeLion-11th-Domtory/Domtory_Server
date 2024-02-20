@@ -39,7 +39,7 @@ admin.site.register(Group, GroupAdmin)
 class MemberCustomAdmin(admin.ModelAdmin):
     list_display = ['id', 'username', 'name', 'status']
     list_display_links = ['id', 'username', 'name', 'status']
-    readonly_fields = ('id', 'password',)
+    readonly_fields = ('id', 'password', 'is_staff', 'is_superuser')
     search_fields = ("name", "username")
     list_filter = ['status']
 
