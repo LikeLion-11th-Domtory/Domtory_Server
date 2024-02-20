@@ -11,3 +11,8 @@ class PushContainer(containers.DeclarativeContainer):
         push_repository=push_repository,
         board_repository=board_repository
     )
+    device_service = providers.Factory(
+        PushService,
+        push_repository=push_repository,
+        board_repository=board_repository
+    )
