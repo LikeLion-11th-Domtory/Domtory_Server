@@ -14,6 +14,8 @@ class ReportAdmin(admin.ModelAdmin):
     list_display_links = ['status', 'target']
     list_filter = ['status']
 
+    actions = ["action_change_valid", "action_change_invalid"]
+
     fields = ('status', 'reported_at', 'target_body')
     readonly_fields = ('reported_at', 'target_body')
 
@@ -34,6 +36,17 @@ class ReportAdmin(admin.ModelAdmin):
         
     target.short_description = '신고글'
     
+    def action_change_valid(self, request, queryset):
+        for report in queryset:
+            report.status=Report.ReportType.VALID
+            self.save_model(request, report, None, True)
+
+    action_change_valid.short_description = "선택된 reports의 status를 VALID으로 바꿉니다."
+    
+    def action_change_invalid(self, request, queryset):
+        queryset.update(status=Report.ReportType.INVALID)
+    
+    action_change_invalid.short_description = "선택된 reports의 status를 INVALID으로 바꿉니다."
 
     def save_model(self, request, obj, form, change):
         if change:
