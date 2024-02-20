@@ -11,7 +11,7 @@ class Menu(models.Model):
 
 class Breakfast(models.Model):
     id = models.AutoField(primary_key=True)
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='breakfasts')
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='breakfast')
     name = models.CharField(max_length=512)
 
     def __str__(self):
@@ -20,7 +20,7 @@ class Breakfast(models.Model):
 
 class Lunch(models.Model):
     id = models.AutoField(primary_key=True)
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='lunches')
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='lunch')
     name = models.CharField(max_length=512)
 
     def __str__(self):
@@ -29,7 +29,7 @@ class Lunch(models.Model):
 
 class Dinner(models.Model):
     id = models.AutoField(primary_key=True)
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='dinners')
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='dinner')
     name = models.CharField(max_length=512)
 
     def __str__(self):
