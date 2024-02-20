@@ -64,16 +64,13 @@ class PushService:
         return notification_data
     
     def make_multicast_message(self, notification_data: dict):
-        # 만약에 data가 없다면 해당 알림은 식단 알림이다. 따라서 data가 존재하지 않는다.
+        multicast_extra_data = {
+            "tokens": notification_data.get('tokens')
+        }
+        # 만약에 data 있다면 message에 포함시킨다.
         if notification_data.get('data'):
-            multicast_extra_data = {
-                "data": notification_data.get('data'),
-                "tokens": notification_data.get('tokens')
-            }
-        else:
-            multicast_extra_data = {
-                "tokens": notification_data.get('tokens')
-            }
+            multicast_extra_data['data'] = notification_data.get('data')
+          
         # 알림 필수 정보를 삽입한다.
         message = messaging.MulticastMessage(
             notification = messaging.Notification(
