@@ -4,6 +4,7 @@ from push.views import (
     PushSendView, 
     TokenInvalidView,
     PushListGetVIew,
+    PushCheckView,
 )
 
 app_name = 'push'
@@ -13,4 +14,5 @@ urlpatterns = [
     path('send/', PushSendView.as_view()),
     path('token/invalid/', TokenInvalidView.as_view()),
     path('list/', PushListGetVIew.as_view()),
+    path('check/', PushCheckView.as_view()),
 ]
