@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..models import Comment
+from django.utils import timezone
 
 class ReplyRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,7 +15,7 @@ class ReplyResponseSerializer(serializers.ModelSerializer):
         fields = ['id', 'member', 'parent', 'body', 'anonymous_number', 'created_at', 'is_blocked', 'is_deleted']
 
     def get_created_at(self, obj):
-        return obj.created_at.strftime('%m/%d %H:%M')
+        return timezone.localtime(obj.created_at).strftime('%m/%d %H:%M')
 
 
 class CommentRequestSerializer(serializers.ModelSerializer):
@@ -31,14 +32,4 @@ class CommentResponseSerializer(serializers.ModelSerializer):
         fields = ['id', 'member', 'body', 'created_at', 'anonymous_number', 'is_blocked', 'is_deleted', 'reply']
 
     def get_created_at(self, obj):
-        return obj.created_at.strftime('%m/%d %H:%M')
-    
-
-class CommentMyPageSerializer(serializers.ModelSerializer):
-    created_at = serializers.SerializerMethodField()
-    class Meta:
-        model = Comment
-        fields = ['id', 'member', 'post', 'body', 'created_at', 'is_blocked']
-
-    def get_created_at(self, obj):
-        return obj.created_at.strftime('%m/%d %H:%M')
+        return timezone.localtime(obj.created_at).strftime('%m/%d %H:%M')
