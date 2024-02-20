@@ -13,12 +13,12 @@ class PushView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._push_service = PushContainer.push_service()
+        self._device_service = PushContainer.device_service()
 
     @swagger_auto_schema(request_body=TokenRequestSerializer, responses={"200": ""})
     def post(self, request):
         """
         FCM 푸시 토큰을 서버로 보내는 API 입니다.
         """
-        self._push_service.send_push_token(request.data, request.user)
+        self._device_service.send_push_token(request.data, request.user)
         return Response(status=status.HTTP_200_OK)
