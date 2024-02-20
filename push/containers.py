@@ -1,5 +1,5 @@
 from dependency_injector import containers, providers
-from push.services import PushService
+from push.services import PushService, DeviceService
 from push.domains import PushRepository
 from board.repositories import BoardRepository
 
@@ -12,7 +12,7 @@ class PushContainer(containers.DeclarativeContainer):
         board_repository=board_repository
     )
     device_service = providers.Factory(
-        PushService,
+        DeviceService,
         push_repository=push_repository,
         board_repository=board_repository
     )
