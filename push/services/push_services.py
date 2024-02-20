@@ -5,6 +5,8 @@ from datetime import datetime
 from django.shortcuts import get_list_or_404
 from menu.models import Menu
 from utils.connect_dynamodb import get_dynamodb_table
+from boto3.dynamodb.conditions import Key
+from push.serializers import PushListResponseSerializer
 
 class PushService:
     def __init__(self, push_repository: PushRepository, board_repository: BoardRepository):
@@ -108,6 +110,20 @@ class PushService:
                 new_item = item.copy()
                 new_item['memberId'] = member_id
                 batch.put_item(Item=new_item)
+
+    def get_push_list(self, request_user):
+        table = get_dynamodb_table('domtory')
+        query_params = {
+            'KeyConditionExpression': Key('memberId').eq(request_user.id),
+            'ScanIndexForward': False,
+            'Limit': 20
+        }
+        response = table.query(**query_params).get('Items')
+        for item in response:
+            pushed_at = datetime.strptime(item['pushedAt'], '%Y-%m-%d %H:%M:%S.%f')
+            item['pushedAt'] = pushed_at.strftime('%m/%d %H:%M')
+
+        return PushListResponseSerializer(response, many=True).data
 
     def _make_today_date_code(self):
         now = datetime.now()
