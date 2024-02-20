@@ -8,6 +8,13 @@ class PushListResponseSerializer(serializers.Serializer):
     title = serializers.CharField()
     body = serializers.CharField()
     pushedAt = serializers.CharField()
+    transformedPushedAt = serializers.CharField()
     boardId = serializers.IntegerField(allow_null=True)
     postId = serializers.IntegerField(allow_null=True)
     isChecked = serializers.BooleanField()
+
+
+class PushCheckRequestSerialzier(serializers.Serializer):
+    memberId = serializers.IntegerField(source='member_id')
+    pushedAt = serializers.CharField(source='pushed_at')
+    
