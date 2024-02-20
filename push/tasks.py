@@ -28,7 +28,10 @@ def send_push_notification_handler(
         # notification data를 기반으로 multicast_message를 만든다.
         message = push_service.make_multicast_message(notification_data)
         response = push_service.send_push_notification(message)
-        push_service.save_push_notifications(notification_data)
+
+        # 식단 알림은 저장하지 않는다.
+        if event != 'menu-scheule-event':
+            push_service.save_push_notifications(notification_data)
 
         for idx, resp in enumerate(response.responses):
             if resp.success:
