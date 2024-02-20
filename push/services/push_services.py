@@ -18,7 +18,7 @@ class PushService:
         menu_string_set, title = self._get_menu_data_set_and_message_title(timezone)
         notification_data = {
             'member_ids': member_ids,
-            "title": title,
+            "title": f"🐿️ 오늘의 돔토리 {title} 메뉴에요. 🍽️",
             "body": menu_string_set,
             "tokens": valid_device_tokens
         }
@@ -99,7 +99,7 @@ class PushService:
             'body': notification_data.get('body'),
             'isChecked': 0
         }
-        # 만약 데이터가 있다면(식단 정보가 아니면) data에 있는 정보들을 item에 추가시킨다.
+        # 만약 데이터가 있다면 data에 있는 정보들을 item에 추가시킨다.
         if notification_data.get('data'):
             data: dict = notification_data.get('data')
             for key, value in data.items():
@@ -108,7 +108,7 @@ class PushService:
         #batch_writer를 활용해 한번에 저장시킨다. 이 때 멤버 아이디도 추가한다.
         with table.batch_writer() as batch:
             for member_id in member_ids:
-                new_item = item.copy()  # create a new dictionary
+                new_item = item.copy()
                 new_item['memberId'] = member_id
                 batch.put_item(Item=new_item)
 
