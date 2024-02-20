@@ -38,6 +38,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://domtory.site',
     'http://domtory.site',
 ]
+CSRF_TRUSTED_ORIGINS = ['https://api.domtory.site',]
 
 # Application definition
 
