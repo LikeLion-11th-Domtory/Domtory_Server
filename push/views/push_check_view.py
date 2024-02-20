@@ -29,5 +29,5 @@ class PushCheckView(APIView):
         """
         푸시 알림 기록을 본 직후 불러와서 isChecked를 True로 바꿔주는 api 입니다.
         """
-        response = self._push_service.check_push_notification(request.data)
-        return Response(response, status=status.HTTP_200_OK)
+        self._push_service.check_push_notification(request.data)
+        return Response(status=status.HTTP_200_OK)

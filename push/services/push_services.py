@@ -129,13 +129,13 @@ class PushService:
         push_check_request_serializer.is_valid(raise_exception=True)
         push_data = push_check_request_serializer.validated_data
         
-        response = self._table.update_item(
+        self._table.update_item(
             Key={"memberId": push_data.get('member_id'), "pushedAt": push_data.get('pushed_at')},
             UpdateExpression="set isChecked=:c",
             ExpressionAttributeValues={":c": True},
             ReturnValues="UPDATED_NEW",
         )
-        print(response)
+
 
     def _make_today_date_code(self):
         now = datetime.now()
