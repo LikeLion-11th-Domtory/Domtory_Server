@@ -6,12 +6,13 @@ from django.shortcuts import get_list_or_404
 from menu.models import Menu
 from utils.connect_dynamodb import get_dynamodb_table
 from boto3.dynamodb.conditions import Key
-from push.serializers import PushListResponseSerializer
+from push.serializers import PushListResponseSerializer, PushCheckRequestSerialzier
 
 class PushService:
     def __init__(self, push_repository: PushRepository, board_repository: BoardRepository):
         self._push_repository = push_repository
         self._board_repository = board_repository
+        self._table = get_dynamodb_table('domtory')
     
     def make_menu_push_notification_data(self, event, timezone: str):
         valid_devices = self._push_repository.find_all_devices()
@@ -85,7 +86,6 @@ class PushService:
 
     def save_push_notifications(self, notification_data: dict):
         now = datetime.now()
-        table = get_dynamodb_table('domtory')
 
         # member_ids가 존재하지 않으면, 저장할 필요가 없다. 본인 글에 본인이 댓글, 대댓글을 단 경우이다.
         member_ids: set | None = notification_data.get('member_ids')
@@ -105,25 +105,37 @@ class PushService:
                 item[key] = value
 
         #batch_writer를 활용해 한번에 저장시킨다. 이 때 멤버 아이디도 추가한다.
-        with table.batch_writer() as batch:
+        with self._table.batch_writer() as batch:
             for member_id in member_ids:
                 new_item = item.copy()
                 new_item['memberId'] = member_id
                 batch.put_item(Item=new_item)
 
     def get_push_list(self, request_user):
-        table = get_dynamodb_table('domtory')
         query_params = {
             'KeyConditionExpression': Key('memberId').eq(request_user.id),
             'ScanIndexForward': False,
             'Limit': 20
         }
-        response = table.query(**query_params).get('Items')
+        response = self._table.query(**query_params).get('Items')
         for item in response:
             pushed_at = datetime.strptime(item['pushedAt'], '%Y-%m-%d %H:%M:%S.%f')
-            item['pushedAt'] = pushed_at.strftime('%m/%d %H:%M')
+            item['transformedPushedAt'] = pushed_at.strftime('%m/%d %H:%M')
 
         return PushListResponseSerializer(response, many=True).data
+    
+    def check_push_notification(self, request_data):
+        push_check_request_serializer = PushCheckRequestSerialzier(data=request_data)
+        push_check_request_serializer.is_valid(raise_exception=True)
+        push_data = push_check_request_serializer.validated_data
+        
+        response = self._table.update_item(
+            Key={"memberId": push_data.get('member_id'), "pushedAt": push_data.get('pushed_at')},
+            UpdateExpression="set isChecked=:c",
+            ExpressionAttributeValues={":c": True},
+            ReturnValues="UPDATED_NEW",
+        )
+        print(response)
 
     def _make_today_date_code(self):
         now = datetime.now()
