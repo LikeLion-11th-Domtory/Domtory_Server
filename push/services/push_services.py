@@ -136,6 +136,13 @@ class PushService:
             ReturnValues="UPDATED_NEW",
         )
 
+    def delete_push_notification(self, request_data):
+        push_check_request_serializer = PushCheckRequestSerialzier(data=request_data)
+        push_check_request_serializer.is_valid(raise_exception=True)
+        push_data = push_check_request_serializer.validated_data
+        self._table.delete_item(
+            Key={"memberId": push_data.get('member_id'), "pushedAt": push_data.get('pushed_at')},
+        )
 
     def _make_today_date_code(self):
         now = datetime.now()
