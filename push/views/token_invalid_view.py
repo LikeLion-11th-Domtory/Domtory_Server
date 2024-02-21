@@ -13,12 +13,12 @@ class TokenInvalidView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._push_service = PushContainer.push_service()
+        self._device_service = PushContainer.device_service()
 
     @swagger_auto_schema(request_body=TokenRequestSerializer, responses={"204": ""})
     def post(self, request):
         """
         토큰 삭제 API
         """
-        self._push_service.delete_device(request.data, request.user)
+        self._device_service.delete_device(request.data, request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
