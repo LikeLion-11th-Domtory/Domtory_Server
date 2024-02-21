@@ -21,7 +21,7 @@ class BreakfastListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfasts.all()]
+        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfast.all()]
         return ret
 
 
@@ -40,7 +40,7 @@ class LunchListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunches.all()]
+        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunch.all()]
         return ret
 
 
@@ -59,7 +59,7 @@ class DinnerListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinners.all()]
+        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinner.all()]
         return ret
 
 
@@ -80,7 +80,7 @@ class MenuListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfasts.all()]
-        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunches.all()]
-        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinners.all()]
+        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfast.all()]
+        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunch.all()]
+        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinner.all()]
         return ret
