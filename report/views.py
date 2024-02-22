@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,14 +5,11 @@ import requests
 
 from board.models import *
 from .serializers import *
-
-import json
-
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from board.permissions import IsStaffOrReadOnly
 from board.models import Post, Comment
 from django.shortcuts import get_object_or_404
-
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
 class CreateReportView(APIView):
@@ -49,7 +45,12 @@ class IsBlockedView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsStaffOrReadOnly]
 
+    @swagger_auto_schema(request_body=IsBlindRequestSerializer, responses={"200": ""})
     def post(self, request):
+        """
+        특정 게시글/게시판을 block 시키는 view 입니다.
+        type에는 종류에 따라서 'post' 아니면 'comment'가 들어갑니다.
+        """
         is_blind_request_serializer = IsBlindRequestSerializer(data=request.data)
         is_blind_request_serializer.is_valid(raise_exception=True)
         is_blind_data = is_blind_request_serializer.validated_data
