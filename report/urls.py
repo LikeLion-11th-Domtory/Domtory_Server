@@ -5,4 +5,5 @@ app_name = 'report'
 
 urlpatterns = [
     path('<str:target_type>/<int:target_id>/', CreateReportView.as_view()),
+    path('block/', IsBlockedView.as_view())
 ]
