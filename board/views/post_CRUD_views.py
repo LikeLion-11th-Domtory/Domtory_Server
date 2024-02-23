@@ -7,7 +7,7 @@ from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
 from ..permissions import IsOwnerOrReadOnly
-from PIL import Image
+from PIL import Image, ImageOps
 from io import BytesIO
 from utils.s3 import S3Connect
 import uuid
@@ -54,6 +54,7 @@ class PostCreateView(APIView):
         s3 = S3Connect()
         for i in range(0, len(image_list)):
             image = Image.open(image_list[i])
+            image = ImageOps.exif_transpose(image)
             image = image.convert('RGB')
 
             image.thumbnail((2000, 2000))
@@ -124,6 +125,7 @@ class PostUpdateView(APIView):
         s3 = S3Connect()
         for i in range(0, len(image_list)):
             image = Image.open(image_list[i])
+            image = ImageOps.exif_transpose(image)
             image = image.convert('RGB')
 
             image.thumbnail((2000, 2000))
