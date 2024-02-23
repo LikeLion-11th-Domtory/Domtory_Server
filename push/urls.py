@@ -5,6 +5,7 @@ from push.views import (
     TokenInvalidView,
     PushListGetVIew,
     PushCheckView,
+    PushDeleteView,
 )
 
 app_name = 'push'
@@ -15,4 +16,5 @@ urlpatterns = [
     path('token/invalid/', TokenInvalidView.as_view()),
     path('list/', PushListGetVIew.as_view()),
     path('check/', PushCheckView.as_view()),
+    path('delete/', PushDeleteView.as_view()),
 ]
