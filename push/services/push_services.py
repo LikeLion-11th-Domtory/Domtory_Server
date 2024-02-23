@@ -73,7 +73,7 @@ class PushService:
         # 만약에 data 있다면 message에 포함시킨다.
         if notification_data.get('data'):
             multicast_extra_data['data'] = notification_data.get('data')
-          
+
         # 알림 필수 정보를 삽입한다.
         message = messaging.MulticastMessage(
             notification = messaging.Notification(
@@ -91,9 +91,9 @@ class PushService:
         member_ids: set | None = notification_data.get('member_ids')
         if not member_ids:
             return
-        
+        pushed_at = str(now)
         item = {
-            'pushedAt': str(now),
+            'pushedAt': pushed_at,
             'title': notification_data.get('title'),
             'body': notification_data.get('body'),
             'isChecked': 0
@@ -104,13 +104,17 @@ class PushService:
             for key, value in data.items():
                 item[key] = value
 
-        #batch_writer를 활용해 한번에 저장시킨다. 이 때 멤버 아이디도 추가한다.
+        # batch_writer를 활용해 한번에 저장시킨다. 이 때 멤버 아이디도 추가한다.
         with self._table.batch_writer() as batch:
             for member_id in member_ids:
                 new_item = item.copy()
                 new_item['memberId'] = member_id
                 batch.put_item(Item=new_item)
-
+        
+        # notification_data의 data에 pushedAt을 추가한다.
+        notification_data.get('data')['pushedAt'] = pushed_at
+        return notification_data
+    
     def get_push_list(self, request_user):
         query_params = {
             'KeyConditionExpression': Key('memberId').eq(request_user.id),
