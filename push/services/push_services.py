@@ -7,6 +7,7 @@ from menu.models import Menu
 from utils.connect_dynamodb import get_dynamodb_table
 from boto3.dynamodb.conditions import Key
 from push.serializers import PushListResponseSerializer, PushCheckRequestSerialzier
+from board.models import Post
 
 class PushService:
     def __init__(self, push_repository: PushRepository, board_repository: BoardRepository):
@@ -65,7 +66,27 @@ class PushService:
             "data": data
         }
         return notification_data
-    
+
+    def make_lightning_post_push_notification_data(self, event: str, post_id: int):
+        post: Post = self._board_repository.find_post_by_id(post_id)
+        valid_devices = self._push_repository.find_all_devices()
+        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
+        member_ids = {valid_device.member_id for valid_device in valid_devices}
+
+        title = f'🐿️ ⚡️새로운 번개모임⚡️이 생겼어요!'
+        data={
+            'postId': str(post.id),
+            'boardId': str(post.board_id)
+        }
+        notification_data = {
+            "member_ids": member_ids,
+            "title": title,
+            "body": f"{post.title}",
+            "tokens": valid_device_tokens,
+            "data": data
+        }
+        return notification_data
+
     def make_multicast_message(self, notification_data: dict):
         multicast_extra_data = {
             "tokens": notification_data.get('tokens')
