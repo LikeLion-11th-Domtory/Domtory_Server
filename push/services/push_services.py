@@ -20,18 +20,9 @@ class PushService:
         member_ids = {valid_device.member_id for valid_device in valid_devices}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         menu_string_set, title = self._get_menu_data_set_and_message_title(timezone)
-        notification_data = {
-            'member_ids': member_ids,
-            "title": f"🐿️ 오늘의 돔토리 {title} 메뉴에요. 🍽️",
-            "body": menu_string_set,
-            "tokens": valid_device_tokens
-        }
-        return notification_data 
-
-    def send_push_notification(self, message):
-        response = messaging.send_multicast(message)
-        return response
-
+        title = f"🐿️ 오늘의 돔토리 {title} 메뉴에요. 🍽️",
+        return self._wrapping_notification_data(member_ids, title, menu_string_set, valid_device_tokens)
+    
     def make_comment_push_notification_data(
             self,
             event: str,
@@ -58,14 +49,7 @@ class PushService:
             'postId': str(comment.post_id),
             'boardId': str(comment.post.board_id)
         }
-        notification_data = {
-            "member_ids": member_ids,
-            "title": title,
-            "body": comment.body,
-            "tokens": device_tokens,
-            "data": data
-        }
-        return notification_data
+        return self._wrapping_notification_data(member_ids, title, comment.body, device_tokens, data)
 
     def make_lightning_post_push_notification_data(self, event: str, post_id: int):
         post: Post = self._board_repository.find_post_by_id(post_id)
@@ -78,14 +62,7 @@ class PushService:
             'postId': str(post.id),
             'boardId': str(post.board_id)
         }
-        notification_data = {
-            "member_ids": member_ids,
-            "title": title,
-            "body": f"{post.title}",
-            "tokens": valid_device_tokens,
-            "data": data
-        }
-        return notification_data
+        return self._wrapping_notification_data(member_ids, title, post.title, valid_device_tokens, data)
 
     def make_multicast_message(self, notification_data: dict):
         multicast_extra_data = {
@@ -112,6 +89,7 @@ class PushService:
         member_ids: set | None = notification_data.get('member_ids')
         if not member_ids:
             return
+    
         pushed_at = str(now)
         item = {
             'pushedAt': pushed_at,
@@ -136,6 +114,10 @@ class PushService:
         notification_data.get('data')['pushedAt'] = pushed_at
         return notification_data
     
+    def send_push_notification(self, message):
+        response = messaging.send_multicast(message)
+        return response
+
     def get_push_list(self, request_user):
         query_params = {
             'KeyConditionExpression': Key('memberId').eq(request_user.id),
@@ -217,3 +199,14 @@ class PushService:
         ] # 본인의 댓글에 대댓글을 달거나 본인의 글에 있는 댓글에 대댓글을 달 때를 알림이 가지 않게
         devices = self._push_repository.find_devices_by_member_ids(member_ids)
         return list(set(device.device_token for device in devices)), set(member_ids)
+    
+    def _wrapping_notification_data(self, member_ids: list[int], title: str, body: str, tokens: list[str], data=None):
+        notification_data = {
+            "member_ids": member_ids,
+            "title": title,
+            "body": body,
+            "tokens": tokens
+        }
+        if data:
+            notification_data['data'] = data
+        return notification_data
