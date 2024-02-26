@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from board.models import Comment
+from board.models import Comment, Post
 
 class BoardRepository:
 
@@ -14,3 +14,6 @@ class BoardRepository:
         부모가 같은 코멘트들을 member와 조인해서 얻어옴
         """
         return Comment.objects.filter(parent=parent).select_related('member')
+
+    def find_post_by_id(self, post_id) -> Post:
+        return get_object_or_404(Post, id=post_id)
