@@ -13,7 +13,8 @@ def send_push_notification_handler(
         self,
         event: str,
         timezone: str=None,
-        comment_id: int=None
+        comment_id: int=None,
+        post_id: int=None,
     ):
     try:
         push_service = PushContainer.push_service()
@@ -24,8 +25,10 @@ def send_push_notification_handler(
             notification_data = push_service.make_menu_push_notification_data(event, timezone)
         elif event == 'comment-notification-event': # 댓글 알림일 때
             notification_data = push_service.make_comment_push_notification_data(event, comment_id)
-
-        # 식단 알림은 저장하지 않는다. 여기서 
+        elif event == 'lightning-post-notification-event':
+            notification_data = push_service.make_lightning_post_push_notification_data(event, post_id)
+            
+        # 식단 알림은 저장하지 않는다.
         if event != 'menu-scheule-event':
             notification_data = push_service.save_push_notifications(notification_data)
 
