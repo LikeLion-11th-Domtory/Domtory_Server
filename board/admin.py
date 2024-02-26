@@ -39,7 +39,7 @@ class PostAdmin(admin.ModelAdmin):
 
 class PostImageAdmin(admin.ModelAdmin):
     list_display = ('post', 'get_member_name')
-    search_fields = ['post__title', 'member__name']
+    search_fields = ['post__title']
 
     def get_member_name(self, obj):
         return obj.post.member.name
