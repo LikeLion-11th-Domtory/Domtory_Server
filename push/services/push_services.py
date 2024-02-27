@@ -19,8 +19,8 @@ class PushService:
         valid_devices = self._push_repository.find_all_devices()
         member_ids = {valid_device.member_id for valid_device in valid_devices}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
-        menu_string_set, title = self._get_menu_data_set_and_message_title(timezone)
-        title = f"🐿️ 오늘의 돔토리 {title} 메뉴에요. 🍽️",
+        menu_string_set, timezone = self._get_menu_data_set_and_message_title(timezone)
+        title = f"🐿️ 오늘의 돔토리 {timezone} 메뉴에요. 🍽️"
         return self._wrapping_notification_data(member_ids, title, menu_string_set, valid_device_tokens)
     
     def make_comment_push_notification_data(
@@ -175,8 +175,8 @@ class PushService:
         if last_comma != -1:
             menu_string_set = menu_string_set[:last_comma] + menu_string_set[last_comma+1:]
     
-        title = title_mapping.get(timezone)
-        return menu_string_set, title
+        kor_timezone = title_mapping.get(timezone)
+        return menu_string_set, kor_timezone
     
     def _get_device_tokens_and_devices_when_comment(self, comment):
         member_id = comment.post.member_id
