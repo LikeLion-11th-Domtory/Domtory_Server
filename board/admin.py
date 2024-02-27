@@ -48,10 +48,11 @@ class PostImageAdmin(admin.ModelAdmin):
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('body', 'get_member_name', 'post', 'get_created_at')
+    list_display_links = ('body', 'post', 'get_member_name')
     search_fields = ['post__title', 'member__name']
-
+    
     def get_member_name(self, obj):
-        return obj.post.member.name
+        return obj.member.name
     get_member_name.short_description = '작성자'
 
     def get_created_at(self, obj):
