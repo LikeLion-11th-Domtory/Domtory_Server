@@ -51,13 +51,16 @@ class PushService:
         }
         return self._wrapping_notification_data(member_ids, title, comment.body, device_tokens, data)
 
-    def make_lightning_post_push_notification_data(self, event: str, post_id: int):
+    def make_post_push_notification_data(self, event: str, post_id: int):
         post: Post = self._board_repository.find_post_by_id(post_id)
         valid_devices = self._push_repository.find_all_devices()
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         member_ids = {valid_device.member_id for valid_device in valid_devices}
-
-        title = f'🐿️ ⚡️새로운 번개모임⚡️이 생겼어요!'
+        title_dict = {
+            4 : f'🐿️ ⚡️새로운 번개모임⚡️이 생겼어요!',
+            6 : f'🐿️ 새로운 자율회 공지사항이에요! 📢'
+        }
+        title = title_dict.get(post.board_id)
         data={
             'postId': str(post.id),
             'boardId': str(post.board_id)
