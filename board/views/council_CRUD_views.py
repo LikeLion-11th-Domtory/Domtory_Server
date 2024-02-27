@@ -11,7 +11,7 @@ from PIL import Image
 from io import BytesIO
 from utils.s3 import S3Connect
 import uuid
-
+from push.tasks import send_push_notification_handler
 
 class CouncilPostCreateView(APIView):
     """
@@ -25,6 +25,7 @@ class CouncilPostCreateView(APIView):
         serializer = PostRequestSerializer(data = request.data)
         if serializer.is_valid():
             post = serializer.save(member = request.user, board = board)
+            send_push_notification_handler.delay('post-notification-event', post_id=post.id)
             if 'images' not in request.data:
                 return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
 
