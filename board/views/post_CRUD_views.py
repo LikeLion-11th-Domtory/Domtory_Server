@@ -31,7 +31,7 @@ class PostCreateView(APIView):
         if serializer.is_valid():
             post = serializer.save(member = request.user, board = board)
             if post.board_id == 4:
-                send_push_notification_handler.delay('lightning-post-notification-event', post_id=post.id)
+                send_push_notification_handler.delay('post-notification-event', post_id=post.id)
             if 'images' not in request.data:
                 return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
 
