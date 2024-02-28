@@ -46,7 +46,6 @@ class MemberCustomAdmin(admin.ModelAdmin):
 class PersonalInfoExcelFiletAdmin(admin.ModelAdmin):
     list_display = ['excel_file', 'created_at']
     list_display_links = ['created_at']
-    readonly_fields = ['excel_file']
 
 admin.site.register(Member, MemberCustomAdmin)
 admin.site.register(PersonalInfoExcelFile, PersonalInfoExcelFiletAdmin)
