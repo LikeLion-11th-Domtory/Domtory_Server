@@ -41,12 +41,12 @@ class ReportAdmin(admin.ModelAdmin):
             report.status=Report.ReportType.VALID
             self.save_model(request, report, None, True)
 
-    action_change_valid.short_description = "선택된 reports의 status를 VALID으로 바꿉니다."
+    action_change_valid.short_description = "선택한 신고의 상태를 유효한 신고로 바꿉니다."
     
     def action_change_invalid(self, request, queryset):
         queryset.update(status=Report.ReportType.INVALID)
     
-    action_change_invalid.short_description = "선택된 reports의 status를 INVALID으로 바꿉니다."
+    action_change_invalid.short_description = "선택한 신고의 상태를 유효하지 않은 신고로 바꿉니다."
 
     def save_model(self, request, obj, form, change):
         if change:

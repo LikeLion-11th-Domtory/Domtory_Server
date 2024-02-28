@@ -43,5 +43,9 @@ class MemberCustomAdmin(admin.ModelAdmin):
     search_fields = ("name", "username")
     list_filter = ['status']
 
+class PersonalInfoExcelFiletAdmin(admin.ModelAdmin):
+    list_display = ['excel_file', 'created_at']
+    list_display_links = ['created_at']
+
 admin.site.register(Member, MemberCustomAdmin)
-admin.site.register(PersonalInfoExcelFile)
+admin.site.register(PersonalInfoExcelFile, PersonalInfoExcelFiletAdmin)
