@@ -16,6 +16,7 @@ import os
 import firebase_admin
 from firebase_admin import credentials
 from datetime import timedelta
+from utils.lookups import *
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 
@@ -57,6 +58,7 @@ PACKAGE_APPS = [
     'drf_yasg',
     'rest_framework_simplejwt',
     'django_celery_results',
+    'debug_toolbar',
 ]
 
 PROJECT_APPS = [
@@ -79,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -165,3 +168,25 @@ AWS_STORAGE_BUCKET_NAME = config('BUCKET_NAME')
 CELERY_TIMEZONE = 'Asia/Seoul'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}
