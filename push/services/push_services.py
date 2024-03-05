@@ -67,6 +67,12 @@ class PushService:
         }
         return self._wrapping_notification_data(member_ids, title, post.title, valid_device_tokens, data)
 
+    def make_admin_push_notification_data(self, event: str, title: str, body: str):
+        valid_devices = self._push_repository.find_all_devices()
+        member_ids = {valid_device.member_id for valid_device in valid_devices}
+        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
+        return self._wrapping_notification_data(member_ids, title, body, valid_device_tokens)
+    
     def make_multicast_message(self, notification_data: dict):
         multicast_extra_data = {
             "tokens": notification_data.get('tokens')
@@ -86,14 +92,11 @@ class PushService:
         return message
 
     def save_push_notifications(self, notification_data: dict):
-        now = datetime.now()
-
         # member_ids가 존재하지 않으면, 저장할 필요가 없다. 본인 글에 본인이 댓글, 대댓글을 단 경우이다.
         member_ids: set | None = notification_data.get('member_ids')
         if not member_ids:
             return
-    
-        pushed_at = str(now)
+        pushed_at = str(datetime.now())
         item = {
             'pushedAt': pushed_at,
             'title': notification_data.get('title'),
@@ -105,6 +108,8 @@ class PushService:
             data: dict = notification_data.get('data')
             for key, value in data.items():
                 item[key] = value
+            # notification_data의 data에 pushedAt을 추가한다.
+            notification_data.get('data')['pushedAt'] = pushed_at
 
         # batch_writer를 활용해 한번에 저장시킨다. 이 때 멤버 아이디도 추가한다.
         with self._table.batch_writer() as batch:
@@ -112,9 +117,7 @@ class PushService:
                 new_item = item.copy()
                 new_item['memberId'] = member_id
                 batch.put_item(Item=new_item)
-        
-        # notification_data의 data에 pushedAt을 추가한다.
-        notification_data.get('data')['pushedAt'] = pushed_at
+
         return notification_data
     
     def send_push_notification(self, message):

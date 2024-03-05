@@ -14,7 +14,9 @@ def send_push_notification_handler(
         event: str,
         timezone: str=None,
         comment_id: int=None,
-        post_id: int=None
+        post_id: int=None,
+        title: str=None,
+        body: str=None
     ):
     try:
         push_service = PushContainer.push_service()
@@ -27,7 +29,9 @@ def send_push_notification_handler(
             notification_data = push_service.make_comment_push_notification_data(event, comment_id)
         elif event == 'post-notification-event':
             notification_data = push_service.make_post_push_notification_data(event, post_id)
-            
+        elif event == 'admin-notification-event':
+            notification_data = push_service.make_admin_push_notification_data(event, title, body)
+
         # 식단 알림은 저장하지 않는다.
         if event != 'menu-scheule-event':
             notification_data = push_service.save_push_notifications(notification_data)
