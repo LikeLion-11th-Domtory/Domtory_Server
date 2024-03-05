@@ -25,6 +25,8 @@ celery = "^5.3.6"
 django-celery-results = "^2.5.1"
 gevent = "^23.9.1"
 django-storages = "^1.14.2"
+django-debug-toolbar = "^4.3.0"
+faker = "^24.0.0"
 
 [build-system]
 requires = ["poetry-core"]
