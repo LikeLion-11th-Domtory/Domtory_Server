@@ -11,3 +11,4 @@ class Search(models.Lookup):
         return 'MATCH (%s) AGAINST (%s IN BOOLEAN MODE)' % (lhs, rhs), params
     
 models.CharField.register_lookup(Search)
+models.TextField.register_lookup(Search)
