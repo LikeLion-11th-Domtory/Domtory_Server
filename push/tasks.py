@@ -46,4 +46,4 @@ def send_push_notification_handler(
             else:
                 raise FCMSendException
     except Exception as e:
-        logging.error(f'send_push_notification_handler 에러: {e}')
+        logging.error(f'[{event}] message sent error: {e}\n title: {notification_data.get('title')}\n body: {notification_data.get('body')}')
