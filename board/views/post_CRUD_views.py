@@ -6,7 +6,7 @@ from ..serializers import *
 from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
-from ..permissions import IsOwnerOrReadOnly
+from ..permissions import IsOwnerOrReadOnly, IsStaffOrReadOnly
 from ..services import (create_post,
                         update_post,
                         delete_post,)
@@ -48,7 +48,7 @@ class PostDeleteView(APIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
-    
+
     def delete(self, request, post_id):
         post = Post.objects.get(pk = post_id)
         self.check_object_permissions(request, post)
@@ -67,3 +67,15 @@ class PostDetailView(APIView):
         post = get_object_or_404(Post, pk = post_id)
         serializer = PostResponseSerializer(post, context = {'request' : request})
         return Response(serializer.data, status = status.HTTP_200_OK)
+    
+
+class CouncilPostCreateView(APIView):
+    """
+    자율회 게시글 작성 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsStaffOrReadOnly]
+
+    def post(self, request):
+        response = create_post(request, 6)
+        return Response(response, status = status.HTTP_201_CREATED)
