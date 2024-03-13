@@ -7,10 +7,7 @@ from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
 from ..permissions import IsOwnerOrReadOnly
-from PIL import Image, ImageOps
-from io import BytesIO
 from utils.s3 import S3Connect
-import uuid
 from push.tasks import send_push_notification_handler
 
 class PostCreateView(APIView):
@@ -41,7 +38,8 @@ class PostCreateView(APIView):
             image_list = image_data.get('images')
             if image_list:
                 try:
-                    self.upload_image(post, image_list)
+                    s3 = S3Connect()
+                    s3.upload_resized_image(post, image_list)
                     return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
                 except:
                     post.delete()
@@ -51,27 +49,6 @@ class PostCreateView(APIView):
                     return Response(res, status = status.HTTP_400_BAD_REQUEST)
             return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-    def upload_image(self, post, image_list):
-        s3 = S3Connect()
-        for i in range(0, len(image_list)):
-            image = Image.open(image_list[i])
-            image = ImageOps.exif_transpose(image)
-            image = image.convert('RGB')
-
-            image.thumbnail((2000, 2000))
-            buffer = BytesIO()
-            image.save(buffer, format = 'JPEG', quality = 80)
-            image_data = buffer.getvalue()
-
-            key = f"{post.board.name}/{post.pk}_{uuid.uuid4().hex}.jpeg"
-            image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
-            
-            PostImage(post = post, image_url = image_url).save()
-            
-            if i == 0:
-                post.thumbnail_url = image_url
-                post.save()
 
 
 class PostUpdateView(APIView):
@@ -101,7 +78,8 @@ class PostUpdateView(APIView):
             image_list = image_data.get('images')
             if image_list:
                 try:
-                    self.upload_image(post, image_list)
+                    s3 = S3Connect()
+                    s3.upload_resized_image(post, image_list)
                     first_image = post.post_image.first()
                     if first_image:
                         post.thumbnail_url = first_image.image_url
@@ -121,24 +99,7 @@ class PostUpdateView(APIView):
             post.thumbnail_url = None
         post.save()
         return Response(PostResponseSerializer(post, context = {'request' : request}).data, status = status.HTTP_200_OK)
-        
 
-    def upload_image(self, post, image_list):
-        s3 = S3Connect()
-        for i in range(0, len(image_list)):
-            image = Image.open(image_list[i])
-            image = ImageOps.exif_transpose(image)
-            image = image.convert('RGB')
-
-            image.thumbnail((2000, 2000))
-            buffer = BytesIO()
-            image.save(buffer, format = 'JPEG', quality = 80)
-            image_data = buffer.getvalue()
-
-            key = f"{post.board.name}/{post.pk}_{uuid.uuid4().hex}.jpeg"
-            image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
-            
-            PostImage(post = post, image_url = image_url).save()
 
 class PostDeleteView(APIView):
     """
