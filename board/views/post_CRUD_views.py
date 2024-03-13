@@ -36,7 +36,9 @@ class PostUpdateView(APIView):
     permission_classes = [IsOwnerOrReadOnly]
 
     def patch(self, request, post_id):
-        response = update_post(request, post_id)
+        post = Post.objects.get(pk = post_id)
+        self.check_object_permissions(request, post)
+        response = update_post(request, post)
         return Response(response, status = status.HTTP_200_OK)
 
 
@@ -46,8 +48,11 @@ class PostDeleteView(APIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
+    
     def delete(self, request, post_id):
-        response = delete_post(post_id)
+        post = Post.objects.get(pk = post_id)
+        self.check_object_permissions(request, post)
+        response = delete_post(post)
         return Response(response, status = status.HTTP_204_NO_CONTENT)
 
 

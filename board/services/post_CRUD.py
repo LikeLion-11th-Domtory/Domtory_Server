@@ -1,5 +1,3 @@
-from rest_framework.response import Response
-from rest_framework import status
 from ..serializers import *
 from ..models import *
 from utils.s3 import S3Connect
@@ -18,7 +16,7 @@ def create_post(request, board_id):
         send_push_notification_handler.delay('post-notification-event', post_id=post.id)
     elif post.board_id == 6:
         send_push_notification_handler.delay('post-notification-event', post_id=post.id)
-        
+
     if 'images' not in request.data:
         return PostResponseSerializer(post, context = {'request' : request}).data
 
@@ -37,8 +35,7 @@ def create_post(request, board_id):
 """
 게시글 수정
 """
-def update_post(request, post_id):
-    post = Post.objects.get(pk = post_id)
+def update_post(request, post):
     if 'title' in request.data:
         post.title = request.data['title']
 
@@ -76,8 +73,7 @@ def update_post(request, post_id):
 """
 게시글 삭제
 """
-def delete_post(post_id):
-    post = Post.objects.get(pk = post_id)
+def delete_post(post):
     post.is_deleted = True
     post.save()
     res = {
