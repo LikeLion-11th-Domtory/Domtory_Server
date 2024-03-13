@@ -1,27 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from ..serializers import *
-from ..models import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
-from django.db.models import Q
-from rest_framework.pagination import PageNumberPagination
-from collections import OrderedDict
-
-
-class PostPageNumberPagination(PageNumberPagination):
-    """
-    페이지네이션 클래스
-    """
-    page_size = 10
-
-    def get_paginated_response(self, data):
-        return Response(OrderedDict([
-            ('pageCnt', self.page.paginator.num_pages),
-            ('curPage', self.page.number),
-            ('postList', data),
-        ]))
+from ..services import (unpaginated_post_list,
+                        paginated_post_list,
+                        recent_posts_in_all_boards,
+                        recent_posts_in_board,
+                        my_posts,
+                        my_comments,
+                        paginated_my_posts_list,
+                        paginated_my_comments)
 
 
 class PostListView(APIView):
@@ -32,17 +21,21 @@ class PostListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, board_id):
-        board = Board.objects.get(pk = board_id)
-        posts = board.post.filter(is_blocked = False, is_deleted = False).order_by('-created_at')
-        if board_id != 6:
-            serializer = PostSimpleSerializer(posts, many = True)
-            return Response(serializer.data, status = status.HTTP_200_OK)
-        paginator = PostPageNumberPagination()
-        page = paginator.paginate_queryset(posts, request)
+        result = unpaginated_post_list(request, board_id)
+        return Response(result, status = status.HTTP_200_OK)
 
-        serializer = PostSimpleSerializer(page, many = True)
-        return paginator.get_paginated_response(serializer.data)
-    
+
+class PaginatedPostListView(APIView):
+    """
+    게시판별 리스트를 페이지네이션하여 반환
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, board_id):
+        result = paginated_post_list(request, board_id)
+        return Response(result, status = status.HTTP_200_OK)
+
 
 class FreeBoardSimpleView(APIView):
     """
@@ -53,11 +46,10 @@ class FreeBoardSimpleView(APIView):
 
     def get(self, request, board_id):
         if board_id != 0: # 특정 게시판에 대하여
-            latest_posts = Post.objects.filter(Q(board__pk = board_id)&Q(is_blocked = False)&Q(is_deleted = False)).order_by('-created_at')[:5]
+            result = recent_posts_in_board(board_id)
         else: # 전체 게시판에 대하여
-            latest_posts = Post.objects.exclude(Q(board__pk = 6)|Q(is_blocked = True)|Q(is_deleted = True)).order_by('-created_at')[:3]
-        serializer = PostSimpleSerializer(latest_posts, many = True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+            result = recent_posts_in_all_boards()
+        return Response(result, status = status.HTTP_200_OK)
     
 
 class MyPostView(APIView):
@@ -68,9 +60,8 @@ class MyPostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        posts = request.user.post.filter(Q(is_deleted = False)&Q(is_blocked = False)).order_by('-created_at')
-        serializer = PostSimpleSerializer(posts, many = True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        result = my_posts(request.user)
+        return Response(result, status = status.HTTP_200_OK)
     
 
 class MyCommentView(APIView):
@@ -81,6 +72,29 @@ class MyCommentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        posts = Post.objects.filter(comment__member=request.user, is_deleted=False, is_blocked=False).prefetch_related('comment__post').distinct().order_by('-created_at')
-        serializer = PostSimpleSerializer(posts, many = True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        result = my_comments(request.user)
+        return Response(result, status = status.HTTP_200_OK)
+    
+
+class PaginatedMyPostView(APIView):
+    """
+    내가 쓴 게시글을 페이지네이션하여 출력하는 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        result = paginated_my_posts_list(request, request.user)
+        return Response(result, status = status.HTTP_200_OK)
+    
+
+class PaginatedMyCommentView(APIView):
+    """
+    내가 댓글을 쓴 게시글을 페이지네이션하여 출력하는 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        result = paginated_my_comments(request, request.user)
+        return Response(result, status = status.HTTP_200_OK)
