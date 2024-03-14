@@ -1,5 +1,5 @@
-from ..serializers import *
-from ..models import *
+from ..serializers import PostSimpleSerializer
+from ..models import Post
 from rest_framework.permissions import *
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination

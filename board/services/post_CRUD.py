@@ -1,5 +1,5 @@
-from ..serializers import *
-from ..models import *
+from ..serializers import PostRequestSerializer, PostResponseSerializer, ImageRequestSerializer
+from ..models import Board, PostImage
 from utils.s3 import S3Connect
 from push.tasks import send_push_notification_handler
 

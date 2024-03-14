@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
-from ..serializers import *
-from ..models import *
+from ..serializers import PostResponseSerializer, CommentRequestSerializer, ReplyRequestSerializer
+from ..models import Post, Comment
 from rest_framework.permissions import *
 from push.tasks import send_push_notification_handler
 
