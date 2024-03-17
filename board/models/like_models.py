@@ -15,8 +15,8 @@ class PostMemberLike(models.Model):
         
 
 class CommentMemberLike(models.Model):
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name = 'like')
-    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name = 'like')
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -14,7 +14,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add = True, verbose_name = '작성일시')
     is_blocked = models.BooleanField(default = False)
     is_deleted = models.BooleanField(default = False)
-    likes_cnt = models.IntegerField(default = 0, null = True)
+    likes_cnt = models.IntegerField(default = 0, null = True, verbose_name = "좋아요 수")
 
     def __str__(self):
         return self.body

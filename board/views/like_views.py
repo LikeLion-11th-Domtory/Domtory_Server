@@ -15,7 +15,7 @@ class PostLikeView(APIView):
 
     def post(self, request, post_id):
         response = create_post_like(request, post_id)
-        return Response(status=status.HTTP_200_OK)
+        return Response(response, {"detail": "이 글을 공감하였습니다."}, status=status.HTTP_200_OK)
     
 
 class CommentLikeView(APIView):
@@ -24,4 +24,4 @@ class CommentLikeView(APIView):
 
     def post(self, request, post_id):
         response = create_comment_like(request, post_id)
-        return Response(status=status.HTTP_200_OK)
+        return Response(response, {"detail": "이 댓글을 공감하였습니다."}, status=status.HTTP_200_OK)

@@ -4,7 +4,7 @@ from board.models.popular_post_models import *
 from board.models.post_models import *
 
 from django.utils import timezone
-from django.db import Q
+from django.db.models import Q
 
 from utils.exceptions.like_exception import (
         PostAuthorExceptionError,
@@ -25,12 +25,12 @@ def create_post_like(request, post_id):
 
     #본인 게시글에 좋아요 금지
     if member_id == get_liked_post.member: #작성자는 좋아요를 누를 수 없음
-        return PostAuthorExceptionError
+        raise PostAuthorExceptionError
     
     #좋아요 중복 금지
     q = Q(id=post_id) & Q(member=member_id)
     if Post.objects.filter(q).exists(): #쿼리 얼마나 쏘는지 체크
-        return PostDuplicateLikeError
+        raise PostDuplicateLikeError
 
 
     #클라이언트와의 교류 없음 -> serializer의 개입 필요없음!
@@ -48,3 +48,8 @@ def create_post_like(request, post_id):
         """
         user에게 푸시 보내는 메서드 필요
         """
+
+    res = {
+        "likes_cnt" : get_liked_post.likes_cnt
+    }
+    return res

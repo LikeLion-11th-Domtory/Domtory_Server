@@ -12,7 +12,7 @@ class ReplyResponseSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = Comment
-        fields = ['id', 'member', 'parent', 'body', 'anonymous_number', 'created_at', 'is_blocked', 'is_deleted']
+        fields = ['id', 'member', 'parent', 'body', 'anonymous_number', 'created_at', 'is_blocked', 'is_deleted', 'likes_cnt']
 
     def get_created_at(self, obj):
         return timezone.localtime(obj.created_at).strftime('%m/%d %H:%M')
@@ -29,7 +29,7 @@ class CommentResponseSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = Comment
-        fields = ['id', 'member', 'body', 'created_at', 'anonymous_number', 'is_blocked', 'is_deleted', 'reply']
+        fields = ['id', 'member', 'body', 'created_at', 'anonymous_number', 'is_blocked', 'is_deleted', 'reply', 'likes_cnt']
 
     def get_created_at(self, obj):
         return timezone.localtime(obj.created_at).strftime('%m/%d %H:%M')
