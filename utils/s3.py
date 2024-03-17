@@ -1,5 +1,9 @@
 from decouple import config
 import boto3
+from PIL import Image, ImageOps
+from io import BytesIO
+import uuid
+from board.models import PostImage, Post
 
 class S3Connect:
     _aws_access_key = config('AWS_ACCESS_KEY')
@@ -23,3 +27,24 @@ class S3Connect:
 
     def delete_object(self, key: str):
         self._s3_conn.delete_object(Bucket=self._bucket_name, Key=key)
+
+    def upload_resized_image(self, post, image_list):
+        s3 = S3Connect()
+        for i in range(0, len(image_list)):
+            image = Image.open(image_list[i])
+            image = ImageOps.exif_transpose(image)
+            image = image.convert('RGB')
+
+            image.thumbnail((2000, 2000))
+            buffer = BytesIO()
+            image.save(buffer, format = 'JPEG', quality = 80)
+            image_data = buffer.getvalue()
+
+            key = f"{post.board.name}/{post.pk}_{uuid.uuid4().hex}.jpeg"
+            image_url = s3.upload_to_s3(image_data = image_data, key = key, content_type = 'image/jpeg')
+            
+            PostImage(post = post, image_url = image_url).save()
+            
+            if i == 0:
+                post.thumbnail_url = image_url
+                post.save()
