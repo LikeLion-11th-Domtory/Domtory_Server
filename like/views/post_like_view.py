@@ -1,5 +1,5 @@
 
 
 
-class PostLikeView(APIView):
-    def post():
+# class PostLikeView(APIView):
+#     def post():
