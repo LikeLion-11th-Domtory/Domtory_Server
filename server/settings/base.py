@@ -163,5 +163,4 @@ AWS_STORAGE_BUCKET_NAME = config('BUCKET_NAME')
 
 #######celery#######
 CELERY_TIMEZONE = 'Asia/Seoul'
-CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
