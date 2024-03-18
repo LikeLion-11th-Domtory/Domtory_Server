@@ -2,7 +2,7 @@ from django.db import models
 
 class NotificationDetail(models.Model):
     id = models.BigAutoField(primary_key=True)
-    member = models.ForeignKey('member.Member', on_delete=models.CASCADE)
+    member = models.OneToOneField('member.Member', on_delete=models.CASCADE)
     breakfast = models.BooleanField(default=True)
     lunch = models.BooleanField(default=True)
     dinner = models.BooleanField(default=True)
