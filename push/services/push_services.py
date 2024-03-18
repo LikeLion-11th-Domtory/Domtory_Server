@@ -53,9 +53,20 @@ class PushService:
 
     def make_post_push_notification_data(self, event: str, post_id: int):
         post: Post = self._board_repository.find_post_by_id(post_id)
-        valid_devices = self._push_repository.find_all_devices()
-        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
-        member_ids = {valid_device.member_id for valid_device in valid_devices}
+       
+        if post.board_id == 4:
+            valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail()
+            member_ids = {
+                valid_device.member_id for valid_device in valid_devices if valid_device.member.notificationdetail.lightning_post
+            }
+            valid_device_tokens = [
+                valid_device.device_token for valid_device in valid_devices if valid_device.member.notificationdetail.lightning_post
+            ]
+        else:
+            valid_devices = self._push_repository.find_all_devices()
+            valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
+            member_ids = {valid_device.member_id for valid_device in valid_devices}
+
         title_dict = {
             4 : f'🐿️ ⚡️새로운 번개모임⚡️이 생겼어요!',
             6 : f'🐿️ 새로운 자율회 공지사항이에요! 📢'
