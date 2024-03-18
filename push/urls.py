@@ -6,6 +6,7 @@ from push.views import (
     PushListGetVIew,
     PushCheckView,
     PushDeleteView,
+    NotificationDetailGetView,
 )
 
 app_name = 'push'
@@ -17,4 +18,5 @@ urlpatterns = [
     path('list/', PushListGetVIew.as_view()),
     path('check/', PushCheckView.as_view()),
     path('delete/', PushDeleteView.as_view()),
+    path('notification-detail/', NotificationDetailGetView.as_view()),
 ]
