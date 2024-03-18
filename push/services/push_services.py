@@ -16,9 +16,9 @@ class PushService:
         self._table = get_dynamodb_table('domtory')
     
     def make_menu_push_notification_data(self, event, timezone: str):
-        valid_devices = self._push_repository.find_all_devices()
-        member_ids = {valid_device.member_id for valid_device in valid_devices}
-        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
+        valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail()
+        member_ids = {valid_device.member_id for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, timezone)}
+        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, timezone)]
         menu_string_set, timezone = self._get_menu_data_set_and_message_title(timezone)
         title = f"🐿️ 오늘의 돔토리 {timezone} 메뉴에요. 🍽️"
         return self._wrapping_notification_data(member_ids, title, menu_string_set, valid_device_tokens)
