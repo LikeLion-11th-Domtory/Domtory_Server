@@ -5,8 +5,8 @@ from board.models.post_models import Post
 
 
 class PostMemberLike(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, null=False, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -15,8 +15,8 @@ class PostMemberLike(models.Model):
         
 
 class CommentMemberLike(models.Model):
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, null=False, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, null=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

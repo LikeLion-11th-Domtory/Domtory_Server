@@ -11,17 +11,18 @@ from utils.exceptions.like_exception import (
 
 
 def create_comment_like(request, comment_id):
-     # request로 전달받은 PostMemberLike 객체 직렬화, 검증, 저장
-    comment_like_request_serializer = CommentLikeRequestSerializer(data=request.data, context={'comment':comment_id, 'member':request.user})
-    comment_like_request_serializer.is_valid(raise_exception=True)
-    comment_like_data = comment_like_request_serializer.validated_data
+    comment = Comment.objects.get(pk=comment_id)
 
-    comment_id = comment_like_data.get('comment')
-    member_id = comment_like_data.get('member')
-    get_liked_comment = Comment.objects.get(pk=comment_id) #좋아요 받은 Post객체 불러옴
+     # request로 전달받은 CommentMemberLike 객체 직렬화, 검증, 저장
+    comment_like_request_serializer = CommentLikeRequestSerializer(data={'comment':comment.id, 'member':request.user})
+    comment_like_request_serializer.is_valid(raise_exception=True)
+    comment_like_data = comment_like_request_serializer.save()
+
+    comment_id = comment_like_data.comment
+    member_id = comment_like_data.member
 
     #본인 댓글에 좋아요 금지
-    if member_id == get_liked_comment.member: #작성자는 좋아요를 누를 수 없음
+    if member_id == comment.member: #작성자는 좋아요를 누를 수 없음
         raise CommentAuthorExceptionError
     
     #좋아요 중복 금지
@@ -30,10 +31,10 @@ def create_comment_like(request, comment_id):
         raise CommentDuplicateLikeError
 
 
-    get_liked_comment.likes_cnt += 1
-    get_liked_comment.save(update_fields=['likes_cnt'])
+    comment.likes_cnt += 1
+    comment.save(update_fields=['likes_cnt'])
 
     res = {
-        "likes_cnt" : get_liked_comment.likes_cnt
+        "likes_cnt" : comment.likes_cnt
     }
     return res
