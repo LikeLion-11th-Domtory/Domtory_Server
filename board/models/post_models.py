@@ -15,7 +15,7 @@ class Post(models.Model):
     is_blocked = models.BooleanField(default = False)
     is_deleted = models.BooleanField(default = False)
     thumbnail_url = models.CharField(null = True, max_length = 255)
-    likes_cnt = models.IntegerField(default = 0, null = True)
+    likes_cnt = models.IntegerField(default = 0, null = False, verbose_name = '좋아요 수')
 
     def __str__(self):
         return self.title

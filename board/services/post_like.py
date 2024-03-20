@@ -13,24 +13,21 @@ from utils.exceptions.like_exception import (
 
 def create_post_like(request, post_id):
     post = Post.objects.get(pk=post_id)
-
+    
+    #본인 게시글에 좋아요 금지
+    if request.user.id == post.member.id: #작성자는 좋아요를 누를 수 없음
+        raise PostAuthorExceptionError
+    
+    #좋아요 중복 금지 (좋아요 객체 저장 전에 해야함)
+    if PostMemberLike.objects.filter(Q(post=post) & Q(member=request.user.id)).exists(): #쿼리 얼마나 쏘는지 체크
+        print("duplicate!")
+        raise PostDuplicateLikeError
+    
+    
     # request로 전달받은 PostMemberLike 객체 직렬화, 검증, 저장
     post_like_request_serializer = PostLikeRequestSerializer(data={'post':post.id, 'member':request.user.id})
     post_like_request_serializer.is_valid(raise_exception=True)
-    post_like_data = post_like_request_serializer.save()
-
-
-    post_id = post_like_data.post
-    member_id = post_like_data.member
-
-    #본인 게시글에 좋아요 금지
-    if member_id == post.member: #작성자는 좋아요를 누를 수 없음
-        raise PostAuthorExceptionError
-    
-    #좋아요 중복 금지
-    q = Q(id=post_id) & Q(member=member_id)
-    if Post.objects.filter(q).exists(): #쿼리 얼마나 쏘는지 체크
-        raise PostDuplicateLikeError
+    post_like_request_serializer.save()
 
     post.likes_cnt += 1
     post.save(update_fields=['likes_cnt'])
@@ -40,7 +37,7 @@ def create_post_like(request, post_id):
         # hot_post_response_serializer = PostResponseSerializer(get_liked_post)
 
         popular_at = timezone.now()
-        new_popular_post = PopularPost(post=post_id, popular_at=popular_at)
+        new_popular_post = PopularPost(post=post, popular_at=popular_at)
         new_popular_post.save()
 
         """
