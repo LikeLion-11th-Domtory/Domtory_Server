@@ -15,13 +15,12 @@ def create_post_like(request, post_id):
     post = Post.objects.get(pk=post_id)
     
     #본인 게시글에 좋아요 금지
-    if request.user.id == post.member.id: #작성자는 좋아요를 누를 수 없음
+    if request.user.id == post.member_id: #작성자는 좋아요를 누를 수 없음
         raise PostAuthorExceptionError
     
     #좋아요 중복 금지 (좋아요 객체 저장 전에 해야함)
-    if PostMemberLike.objects.filter(Q(post=post) & Q(member=request.user.id)).exists(): #쿼리 얼마나 쏘는지 체크
-        print("duplicate!")
-        raise PostDuplicateLikeError
+    # if PostMemberLike.objects.filter(post=post, member=request.user.id).exists(): #쿼리 얼마나 쏘는지 체크
+    #     raise PostDuplicateLikeError
     
     
     # request로 전달받은 PostMemberLike 객체 직렬화, 검증, 저장
@@ -34,8 +33,6 @@ def create_post_like(request, post_id):
 
     #핫게 PopularPost 등록
     if post.likes_cnt == 5:
-        # hot_post_response_serializer = PostResponseSerializer(get_liked_post)
-
         popular_at = timezone.now()
         new_popular_post = PopularPost(post=post, popular_at=popular_at)
         new_popular_post.save()
