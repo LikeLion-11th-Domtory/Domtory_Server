@@ -19,8 +19,8 @@ def create_post_like(request, post_id):
         raise PostAuthorExceptionError
     
     #좋아요 중복 금지 (좋아요 객체 저장 전에 해야함)
-    # if PostMemberLike.objects.filter(post=post, member=request.user.id).exists(): #쿼리 얼마나 쏘는지 체크
-    #     raise PostDuplicateLikeError
+    if PostMemberLike.objects.filter(post=post, member=request.user.id).exists(): #쿼리 얼마나 쏘는지 체크
+        raise PostDuplicateLikeError
     
     
     # request로 전달받은 PostMemberLike 객체 직렬화, 검증, 저장
