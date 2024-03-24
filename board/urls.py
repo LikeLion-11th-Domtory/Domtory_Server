@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import *
+from .views.popular_board_list_views import *
+from .views.like_views import *
 
 app_name = 'board'
 
@@ -29,4 +31,10 @@ urlpatterns = [
     path('mypage/paged/post/', PaginatedMyPostView.as_view()), # 내가 쓴 게시글
     path('mypage/paged/comment/', PaginatedMyCommentView.as_view()), # 내가 댓글을 쓴 게시글
     path('post/paged/search/<int:board_id>/', PaginatedPostSearchView.as_view()), # 검색 결과를 페이지네이션하여 반환
+
+    # 좋아요, 핫게 관련 API
+    path('post/paged/list/popular/', PopularBoardListView.as_view()), #핫게시판 게시글 리스트 (페이지네이션)
+    path('post/like/<int:post_id>/', PostLikeView.as_view()), #게시물 좋아요
+    path('comment/like/<int:comment_id>/', CommentLikeView.as_view()), #댓글 좋아요
+    
 ]
