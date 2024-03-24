@@ -9,11 +9,11 @@ class BoardRepository:
         """
         return get_object_or_404(Comment.objects.select_related('post', 'parent'), id=comment_id)
     
-    def find_comments_by_parent_with_member(self, parent) -> Comment:
+    def find_comments_by_parent_with_member_and_notification_detail(self, parent) -> Comment:
         """
-        부모가 같은 코멘트들을 member와 조인해서 얻어옴
+        부모가 같은 코멘트들을 member와 notification_detail을 조인해서 얻어옴
         """
-        return Comment.objects.filter(parent=parent).select_related('member')
+        return Comment.objects.filter(parent=parent).select_related('member', 'member__notificationdetail')
 
     def find_post_by_id(self, post_id) -> Post:
         return get_object_or_404(Post, id=post_id)

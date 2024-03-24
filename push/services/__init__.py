@@ -1,2 +1,3 @@
 from .push_services import PushService
 from .device_service import DeviceService
+from .notification_detail_service import NotificationDetailService

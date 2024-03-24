@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .domains import AdminPushNotification, Device
+from .domains import AdminPushNotification, Device, NotificationDetail
 from push.tasks import send_push_notification_handler
 from datetime import datetime
 import pytz
@@ -32,3 +32,4 @@ class AdminPushNotificationAdmin(admin.ModelAdmin):
 
 admin.site.register(AdminPushNotification, AdminPushNotificationAdmin)
 admin.site.register(Device)
+admin.site.register(NotificationDetail)
