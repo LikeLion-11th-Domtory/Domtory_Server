@@ -18,7 +18,7 @@ class PushCheckRequestSerialzier(serializers.Serializer):
     memberId = serializers.IntegerField(source='member_id')
     pushedAt = serializers.CharField(source='pushed_at')
     
-class NotificationDetailResponseSerializer(serializers.ModelSerializer):
+class NotificationDetailSerializer(serializers.ModelSerializer):
     lightningPost = serializers.BooleanField(source='lightning_post')
 
     class Meta:
