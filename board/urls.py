@@ -36,5 +36,8 @@ urlpatterns = [
     path('post/paged/list/popular/', PopularBoardListView.as_view()), #핫게시판 게시글 리스트 (페이지네이션)
     path('post/like/<int:post_id>/', PostLikeView.as_view()), #게시물 좋아요
     path('comment/like/<int:comment_id>/', CommentLikeView.as_view()), #댓글 좋아요
+
+    # 스크랩 API
+    path('post/bookmark/<int:post_id>/', BookmarkPostView.as_view()), # 게시글을 스크랩
     
 ]
