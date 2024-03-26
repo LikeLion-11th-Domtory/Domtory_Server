@@ -39,5 +39,5 @@ urlpatterns = [
 
     # 스크랩 API
     path('post/bookmark/<int:post_id>/', BookmarkPostView.as_view()), # 게시글을 스크랩
-    
+    path('post/bookmark/list/', BookmarkListView.as_view()), # 스크랩한 게시글 리스트
 ]
