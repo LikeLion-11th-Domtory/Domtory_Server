@@ -3,6 +3,7 @@ from ..models import *
 from .comment_serializer import *
 from django.utils import timezone
 from datetime import timedelta
+from board.models import PostMemberBookmark, PostMemberLike
 
 class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,13 +30,16 @@ class PostResponseSerializer(serializers.ModelSerializer):
     comment = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
+    is_bookmarked = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     class Meta:
         model = Post
         fields = '__all__'
 
     def get_comment(self, obj):
         comments = obj.comment.filter(parent = None)
-        serializer = CommentResponseSerializer(comments, many=True).data
+        request = self.context.get('request')
+        serializer = CommentResponseSerializer(comments, many=True, context = {'request' : request}).data
         return serializer
     
     def get_status(self, obj):
@@ -67,6 +71,18 @@ class PostResponseSerializer(serializers.ModelSerializer):
             if request.user == obj.member: return True
         return False
     
+    def get_is_bookmarked(self, obj):
+        request = self.context.get('request')
+        if PostMemberBookmark.objects.filter(post = obj, member = request.user.id):
+            return True
+        return False
+    
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if PostMemberLike.objects.filter(post = obj, member = request.user.id):
+            return True
+        return False
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.board.pk == 6:
@@ -79,7 +95,7 @@ class PostSimpleSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id', 'member', 'board', 'status', 'title', 'body', 'comment_cnt', 'thumbnail_url', 'created_at', 'likes_cnt']
+        fields = ['id', 'member', 'board', 'status', 'title', 'body', 'comment_cnt', 'thumbnail_url', 'created_at', 'likes_cnt', 'bookmark_cnt']
 
     def get_status(self, obj):
         return obj.member.status
