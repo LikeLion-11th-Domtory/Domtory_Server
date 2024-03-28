@@ -108,7 +108,7 @@ class PushService:
         # member_ids가 존재하지 않으면, 저장할 필요가 없다. 본인 글에 본인이 댓글, 대댓글을 단 경우이다.
         member_ids: set | None = notification_data.get('member_ids')
         if not member_ids:
-            return
+            return notification_data
         pushed_at = str(datetime.now())
         item = {
             'pushedAt': pushed_at,
