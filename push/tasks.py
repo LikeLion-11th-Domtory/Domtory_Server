@@ -42,13 +42,8 @@ def send_push_notification_handler(
 
         for idx, resp in enumerate(response.responses):
             if resp.success:
-                logging.info(f'Successfully sent {event} message: {resp.message_id}')
+                logging.info(f'[{idx}] Successfully sent {event} message: {resp.message_id}')
             else:
-                raise FCMSendException
+                logging.info(f'[{idx}] Message sent failure {event} message: {resp.exception}')
     except Exception as e:
-        if notification_data:
-            error_title = notification_data.get('title', None)
-            error_body = notification_data.get('body', None)
-            logging.error(f'[{event}] message sent error: {e}\n title: {error_title}\n body: {error_body}')
-        else:
-            logging.error(f'[{event}] message sent error: {e}')
+        logging.error(f"push handler error: {e}")
