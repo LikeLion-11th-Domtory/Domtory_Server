@@ -1,7 +1,29 @@
-from ..serializers import PostRequestSerializer, PostResponseSerializer, ImageRequestSerializer
-from ..models import Board, PostImage
+from ..serializers import PostRequestSerializer, PostResponseSerializer, ImageRequestSerializer, CommentResponseSerializer
+from ..models import Board, PostImage, Post, Comment
 from utils.s3 import S3Connect
 from push.tasks import send_push_notification_handler
+from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
+
+"""
+게시글 디테일 페이지
+"""
+def get_post_detail(request, post_id):
+    reply_prefetch = Prefetch(
+        'reply',
+        queryset=Comment.objects.all().order_by('created_at')
+    )
+    comment_prefetch = Prefetch(
+        'comment',
+        queryset=Comment.objects.prefetch_related(reply_prefetch).filter(parent = None).order_by('created_at')
+    )
+    post = get_object_or_404(
+        Post.objects.prefetch_related(comment_prefetch),
+        id = post_id
+    )
+    response = PostResponseSerializer(post, context = {'request' : request}).data
+    return response
+
 
 """
 게시글 작성 메소드
@@ -18,7 +40,8 @@ def create_post(request, board_id):
         send_push_notification_handler.delay('post-notification-event', post_id=post.id)
 
     if 'images' not in request.data:
-        return PostResponseSerializer(post, context = {'request' : request}).data
+        response = get_post_detail(request, post.id)
+        return response
 
     image_request_serializer = ImageRequestSerializer(data = request.data)
     image_request_serializer.is_valid(raise_exception=True)
@@ -28,8 +51,9 @@ def create_post(request, board_id):
     if image_list:
         s3 = S3Connect()
         s3.upload_resized_image(post, image_list)
-        return PostResponseSerializer(post, context = {'request' : request}).data
-    return PostResponseSerializer(post, context = {'request' : request}).data
+    
+    response = get_post_detail(request, post.id)
+    return response
 
 
 """
@@ -67,7 +91,8 @@ def update_post(request, post):
     else:
         post.thumbnail_url = None
     post.save()
-    return PostResponseSerializer(post, context = {'request' : request}).data
+    response = get_post_detail(request, post.id)
+    return response
 
 
 """

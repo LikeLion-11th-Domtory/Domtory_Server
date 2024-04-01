@@ -27,7 +27,7 @@ class PostRequestSerializer(serializers.ModelSerializer):
 class PostResponseSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     post_image = PostImageSerializer(many = True)
-    comment = serializers.SerializerMethodField()
+    comment = CommentResponseSerializer(many = True, read_only = True)
     created_at = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     is_bookmarked = serializers.SerializerMethodField()
@@ -35,12 +35,6 @@ class PostResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
-
-    def get_comment(self, obj):
-        comments = obj.comment.filter(parent = None)
-        request = self.context.get('request')
-        serializer = CommentResponseSerializer(comments, many=True, context = {'request' : request}).data
-        return serializer
     
     def get_status(self, obj):
         return obj.member.status
