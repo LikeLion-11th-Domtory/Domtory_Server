@@ -4,6 +4,7 @@ from ..models import Post, Comment
 from board.services.post_CRUD import get_post_detail
 from rest_framework.permissions import *
 from push.tasks import send_push_notification_handler
+from utils.exceptions import CommentPermissionError
 
 
 """
@@ -44,7 +45,11 @@ def create_comment(request, post_id):
 """
 댓글 삭제 메소드
 """
-def delete_comment(request, comment):
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id = comment_id)
+    if comment.member != request.user:
+        raise CommentPermissionError
+    
     post = comment.post
     comment.is_deleted = True
     comment.save()

@@ -4,6 +4,7 @@ from utils.s3 import S3Connect
 from push.tasks import send_push_notification_handler
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
+from utils.exceptions import PostPermissionError
 
 """
 게시글 디테일 페이지
@@ -59,7 +60,11 @@ def create_post(request, board_id):
 """
 게시글 수정
 """
-def update_post(request, post):
+def update_post(request, post_id):
+    post = get_object_or_404(Post, id = post_id)
+    if post.member != request.user:
+        raise PostPermissionError
+    
     if 'title' in request.data:
         post.title = request.data['title']
 
@@ -98,10 +103,14 @@ def update_post(request, post):
 """
 게시글 삭제
 """
-def delete_post(post):
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id = post_id)
+    if post.member != request.user:
+        raise PostPermissionError
+    
     post.is_deleted = True
     post.save()
-    res = {
+    response = {
         "msg" : "게시글 삭제 완료"
     }
-    return res
+    return response

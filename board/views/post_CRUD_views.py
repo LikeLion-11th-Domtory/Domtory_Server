@@ -1,10 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from ..models import Post
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
-from ..permissions import IsOwnerOrReadOnly, IsStaffOrReadOnly
+from ..permissions import IsStaffOrReadOnly
 from ..services import (create_post,
                         update_post,
                         delete_post,
@@ -18,11 +17,6 @@ class PostCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, board_id):
-        if board_id == 6:
-            res = {
-                "detail": "자율회 게시글 작성 API를 사용해주세요."
-            }
-            return Response(res, status=status.HTTP_403_FORBIDDEN)
         response = create_post(request, board_id)
         return Response(response, status = status.HTTP_201_CREATED)
 
@@ -32,12 +26,10 @@ class PostUpdateView(APIView):
     게시글 수정 뷰
     """
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, post_id):
-        post = Post.objects.get(pk = post_id)
-        self.check_object_permissions(request, post)
-        response = update_post(request, post)
+        response = update_post(request, post_id)
         return Response(response, status = status.HTTP_200_OK)
 
 
@@ -46,12 +38,10 @@ class PostDeleteView(APIView):
     게시글 삭제 뷰
     """
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, post_id):
-        post = Post.objects.get(pk = post_id)
-        self.check_object_permissions(request, post)
-        response = delete_post(post)
+        response = delete_post(request, post_id)
         return Response(response, status = status.HTTP_204_NO_CONTENT)
 
 
