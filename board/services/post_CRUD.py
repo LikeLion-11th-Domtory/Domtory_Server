@@ -19,7 +19,7 @@ def get_post_detail(request, post_id):
         queryset=Comment.objects.prefetch_related(reply_prefetch).filter(parent = None).order_by('created_at')
     )
     post = get_object_or_404(
-        Post.objects.prefetch_related(comment_prefetch),
+        Post.objects.select_related('member', 'board').prefetch_related(comment_prefetch),
         id = post_id
     )
     response = PostResponseSerializer(post, context = {'request' : request}).data
