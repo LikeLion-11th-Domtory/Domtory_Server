@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404
-from ..serializers import PostResponseSerializer, CommentRequestSerializer, ReplyRequestSerializer
+from ..serializers import CommentRequestSerializer, ReplyRequestSerializer
 from ..models import Post, Comment
+from board.services.post_CRUD import get_post_detail
 from rest_framework.permissions import *
 from push.tasks import send_push_notification_handler
+from utils.exceptions import CommentPermissionError
 
 
 """
@@ -35,20 +37,26 @@ def create_comment(request, post_id):
         post.comment_cnt += 1
         post.save()
         send_push_notification_handler.delay('comment-notification-event', None, comment.id)
-        return PostResponseSerializer(post, context = {'request' : request}).data
+        response = get_post_detail(request, post.id)
+        return response
     return serializer.errors
 
 
 """
 댓글 삭제 메소드
 """
-def delete_comment(request, comment):
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id = comment_id)
+    if comment.member != request.user:
+        raise CommentPermissionError
+    
     post = comment.post
     comment.is_deleted = True
     comment.save()
     post.comment_cnt -= 1
     post.save()
-    return PostResponseSerializer(post, context = {'request' : request}).data
+    response = get_post_detail(request, post.pk)
+    return response
 
 
 """
@@ -81,5 +89,6 @@ def create_reply(request, comment_id):
         post.comment_cnt += 1
         post.save()
         send_push_notification_handler.delay('comment-notification-event', None, reply.id)
-        return PostResponseSerializer(post, context = {'request' : request}).data
+        response = get_post_detail(request, post.pk)
+        return response
     return serializer.errors
