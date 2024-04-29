@@ -1,5 +1,7 @@
 from django.db import models
 from board.models import Comment, Post
+from message.domains.message_models import Message
+
 
 # Create your models here.
 
@@ -14,12 +16,15 @@ class Report(models.Model):
     # report_type = 
     post = models.ForeignKey(Post, null=True, blank=True, on_delete=models.SET_NULL)
     comment = models.ForeignKey(Comment, null=True, blank=True, on_delete=models.SET_NULL)
+    message = models.ForeignKey(Message, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         if self.post:
             return f"게시글 신고 : {self.post.body}"
         elif self.comment:
             return f"댓글 신고 : {self.comment.body}"
+        elif self.message:
+            return f"쪽지 신고 : {self.message.body}"
 
     class Meta:
         db_table = 'report'

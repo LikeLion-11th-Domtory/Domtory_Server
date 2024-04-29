@@ -7,5 +7,5 @@ class ReportSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class IsBlindRequestSerializer(serializers.Serializer):
-    postOrCommentId = serializers.IntegerField(source='post_or_comment_id')
+    targetId = serializers.IntegerField(source='target_id')
     type = serializers.CharField()
