@@ -73,7 +73,6 @@ def get_message_list(request):
         if (sender, receiver) in cands or (receiver, sender) in cands:
             continue
         cands.append((sender, receiver))
-    print(cands)
     m_list = []
     for s, r in cands:
         cand = Message.objects.filter((Q(send_id = s) & Q(recv_id = r)) | (Q(send_id = r) & Q(recv_id = s))).order_by('-created_at')[0]
@@ -84,6 +83,7 @@ def get_message_list(request):
             if cand.is_deleted_recv:
                 continue
         m_list.append(cand)
+
 
     response = MessageSimpleSerializer(m_list, many=True, context={'request' : request}).data
     return response
