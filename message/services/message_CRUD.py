@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -20,11 +21,11 @@ def create_message(request, target_id):
     receiver = Member.objects.get(pk=target_id)
 
     try:
-        block = MessageBlock.objects.get(req_id=request.user, tar_id=receiver)
+        block = MessageBlock.objects.get(requester=request.user, target=receiver)
     except MessageBlock.DoesNotExist:
         block = None
     try:
-        blocked = MessageBlock.objects.get(req_id=receiver, tar_id=request.user)
+        blocked = MessageBlock.objects.get(requester=receiver, target=request.user)
     except MessageBlock.DoesNotExist:
         blocked = None
     if block or blocked:
@@ -32,13 +33,15 @@ def create_message(request, target_id):
     if request.user == receiver:
         raise MessageToMeError
 
-    message = serializer.save(send_id=request.user, recv_id=receiver)
+    message = serializer.save(sender=request.user, receiver=receiver)
     return get_message_detail(request, message.id)
 
+@transaction.atomic
 def update_message(request, target_id):
-    sender = request.user
-    receiver = Member.objects.get(pk=target_id)
-    unread_messages = Message.objects.filter(is_read = False, send_id = receiver, recv_id = sender).order_by('created_at')
+    receiver = request.user
+    sender = Member.objects.get(pk=target_id)
+    # 현재 접속한 유저가 받은 & target 유저가 보낸 & 아직 읽지 않은 메시지
+    unread_messages = Message.objects.filter(is_read = False, sender = sender, receiver = receiver).order_by('created_at')
     for message in unread_messages:
         message.is_read = True
         message.save(update_fields=['is_read'])
@@ -47,50 +50,53 @@ def update_message(request, target_id):
     }
     return response
 
+@transaction.atomic
 def delete_messages(request, target_id):
     sender = request.user
     receiver = Member.objects.get(pk=target_id)
-    sent_messages = Message.objects.filter(send_id=sender, recv_id=receiver)
-    received_messages = Message.objects.filter(send_id=receiver, recv_id=sender)
+    sent_messages = Message.objects.filter(sender=sender, receiver=receiver)
+    received_messages = Message.objects.filter(sender=receiver, receiver=sender)
 
-    for smsg in sent_messages:
-        smsg.is_deleted_send = True
-        smsg.save(update_fields=['is_deleted_send'])
-    for rmsg in received_messages:
-        rmsg.is_deleted_recv = True
-        rmsg.save(update_fields=['is_deleted_recv'])
+    for sent_message in sent_messages:
+        sent_message.is_deleted_send = True
+        sent_message.save(update_fields=['is_deleted_send'])
+    for received_message in received_messages:
+        received_message.is_deleted_recv = True
+        received_message.save(update_fields=['is_deleted_recv'])
     response = {
         "msg": "쪽지 삭제 완료"
     }
     return response
 
 def get_message_list(request):
-    messages = Message.objects.filter(Q(recv_id = request.user) | Q(send_id = request.user))
-    cands = []
-    for m in messages:
-        sender = Member.objects.get(pk=m.send_id.id)
-        receiver = Member.objects.get(pk=m.recv_id.id)
-        if (sender, receiver) in cands or (receiver, sender) in cands:
+    user_id = request.user.id
+    messages = Message.objects.filter(Q(receiver = user_id) | Q(sender = user_id)) # 현재 유저가 주고받은 메시지
+    partners = [] # 현재 유저와 쪽지 주고받은 대상의 pk를 저장
+    for message in messages:
+        if message.receiver.id in partners or message.sender.id in partners:
             continue
-        cands.append((sender, receiver))
-    m_list = []
-    for s, r in cands:
-        cand = Message.objects.filter((Q(send_id = s) & Q(recv_id = r)) | (Q(send_id = r) & Q(recv_id = s))).order_by('-created_at')[0]
-        if cand.send_id == request.user:
-            if cand.is_deleted_send:
-                continue
-        elif cand.recv_id == request.user:
-            if cand.is_deleted_recv:
-                continue
-        m_list.append(cand)
+        if message.receiver.id == user_id:
+            partners.append(message.sender.id)
+        if message.sender.id == user_id:
+            partners.append(message.receiver.id)
 
+    recent_messages = [] # 현재 유저가 쪽지 주고받은 대상과 나눈 가장 최근 쪽지 저장
+    for partner_id in partners:
+        recent_message = Message.objects.filter((Q(sender__id = partner_id) & Q(receiver__id = user_id)) | (Q(sender__id = user_id) & Q(receiver__id = partner_id))).order_by('-created_at')[0]
+        if recent_message.sender.id == user_id:
+            if recent_message.is_deleted_send:
+                continue
+        elif recent_message.receiver.id == user_id:
+            if recent_message.is_deleted_recv:
+                continue
+        recent_messages.append(recent_message)
 
-    response = MessageSimpleSerializer(m_list, many=True, context={'request' : request}).data
+    response = MessageSimpleSerializer(recent_messages, many=True, context={'request' : request}).data
     return response
 
 def get_specific_message_list(request, target_id):
     sender = request.user
     receiver = Member.objects.get(pk=target_id)
-    messages = Message.objects.filter((Q(send_id = sender) & Q(recv_id = receiver)) | (Q(send_id = receiver) & Q(recv_id = sender))).order_by('created_at')
+    messages = Message.objects.filter((Q(sender = sender) & Q(receiver = receiver)) | (Q(sender = receiver) & Q(receiver = sender))).order_by('created_at')
     response = MessageResponseSerializer(messages, many=True, context={'request' : request}).data
     return response

@@ -15,17 +15,17 @@ def get_message_block(request, message_block_id):
 def create_message_block(request, target_id):
     target = Member.objects.get(id = target_id)
     try:
-        block = MessageBlock.objects.get(req_id=request.user, tar_id=target)
+        block = MessageBlock.objects.get(requester=request.user, target=target)
     except MessageBlock.DoesNotExist:
         block = None
     try:
-        blocked = MessageBlock.objects.get(req_id=target, tar_id=request.user)
+        blocked = MessageBlock.objects.get(requester=target, target=request.user)
     except MessageBlock.DoesNotExist:
         blocked = None
     if not block and not blocked:
         serializer = MessageBlockRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        block = serializer.save(req_id=request.user, tar_id=target)
+        block = serializer.save(requester=request.user, target=target)
         return get_message_block(request, block.id)
     else:
         raise AlreadyBlockedError
