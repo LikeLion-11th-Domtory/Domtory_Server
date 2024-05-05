@@ -18,7 +18,7 @@ class MessageResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'send_id', 'recv_id', 'body', 'created_at', 'is_read', 'is_received']
+        fields = ['id', 'sender', 'receiver', 'body', 'created_at', 'is_read', 'is_received']
 
     def get_created_at(self, obj):
         time = timezone.localtime(obj.created_at)
@@ -27,7 +27,7 @@ class MessageResponseSerializer(serializers.ModelSerializer):
     def get_is_received(self, obj):
         request = self.context.get('request')
         if request:
-            if request.user == obj.recv_id:
+            if request.user == obj.receiver:
                 return True
         return False
 
@@ -38,7 +38,7 @@ class MessageSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'send_id', 'recv_id', 'body', 'created_at', 'is_read', 'is_received', 'new_messages_cnt']
+        fields = ['id', 'sender', 'receiver', 'body', 'created_at', 'is_read', 'is_received', 'new_messages_cnt']
 
     def get_created_at(self, obj):
         time = timezone.localtime(obj.created_at)
@@ -47,18 +47,16 @@ class MessageSimpleSerializer(serializers.ModelSerializer):
     def get_is_received(self, obj):
         request = self.context.get('request')
         if request:
-            if request.user == obj.recv_id:
+            if request.user == obj.receiver:
                 return True
         return False
 
     def get_new_messages_cnt(self, obj):
         request = self.context.get('request')
-        if request.user == obj.send_id:
+        if request.user == obj.sender:
             return 0
         else:
-            sender = Member.objects.get(pk=obj.send_id.id)
-            receiver = Member.objects.get(pk=obj.recv_id.id)
-            new_messages = Message.objects.filter(Q(send_id = sender) & Q(recv_id = receiver) & Q(is_read = False))
+            new_messages = Message.objects.filter(Q(sender__id = obj.sender.id) & Q(receiver__id = obj.receiver.id) & Q(is_read = False))
             return len(new_messages)
 
 class MessageBlockResponseSerializer(serializers.ModelSerializer):
