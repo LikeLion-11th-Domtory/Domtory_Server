@@ -2,9 +2,8 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework import serializers
 
-from member.domains import Member
 from ..domains.message_block_models import MessageBlock
-from ..domains.message_models import Message
+from ..domains.message_models import Message, MessageRoom
 
 
 class MessageRequestSerializer(serializers.ModelSerializer):
@@ -31,14 +30,15 @@ class MessageResponseSerializer(serializers.ModelSerializer):
                 return True
         return False
 
+
 class MessageSimpleSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     is_received = serializers.SerializerMethodField()
     new_messages_cnt = serializers.SerializerMethodField()
-
+    message_room_id = serializers.SerializerMethodField()
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'receiver', 'body', 'created_at', 'is_read', 'is_received', 'new_messages_cnt']
+        fields = ['id', 'sender', 'receiver', 'body', 'created_at', 'is_read', 'is_received', 'new_messages_cnt', 'message_room_id']
 
     def get_created_at(self, obj):
         time = timezone.localtime(obj.created_at)
@@ -56,8 +56,27 @@ class MessageSimpleSerializer(serializers.ModelSerializer):
         if request.user == obj.sender:
             return 0
         else:
-            new_messages = Message.objects.filter(Q(sender__id = obj.sender.id) & Q(receiver__id = obj.receiver.id) & Q(is_read = False))
+            new_messages = Message.objects.filter(Q(sender = obj.sender) & Q(receiver = obj.receiver) & Q(is_read = False))
             return len(new_messages)
+
+    def get_message_room_id(self, obj):
+        return obj.message_room_id
+
+
+class MessageRoomRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MessageRoom
+        fields = []
+
+class MessageRoomResponseSerializer(serializers.ModelSerializer):
+    post_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MessageRoom
+        fields = ['id', 'post_title', 'receiver_anonymous_num']
+
+    def get_post_title(self, obj):
+        return obj.post.title
 
 class MessageBlockResponseSerializer(serializers.ModelSerializer):
     class Meta:
