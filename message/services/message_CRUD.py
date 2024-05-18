@@ -68,7 +68,7 @@ def create_message(request, message_room_id):
     serializer = MessageRequestSerializer(data = request.data)
     serializer.is_valid(raise_exception=True)
 
-    message_room = MessageRoom.objects.get(pk=message_room_id)
+    message_room = get_object_or_404(MessageRoom, id = message_room_id)
     sender = request.user
     if message_room.first_sender == sender:
         receiver = message_room.first_receiver
@@ -146,6 +146,15 @@ def get_message_list(request):
 
 
 def get_specific_message_list(request, message_room_id):
+    user = request.user
     messages = Message.objects.filter(message_room_id=message_room_id).order_by('created_at')
-    response = MessageResponseSerializer(messages, many=True, context={'request' : request}).data
+    not_deleted_messages = []
+    for message in messages:
+        if message.sender == user:
+            if not message.is_deleted_send:
+                not_deleted_messages.append(message)
+        if message.receiver == user:
+            if not message.is_deleted_recv:
+                not_deleted_messages.append(message)
+    response = MessageResponseSerializer(not_deleted_messages, many=True, context={'request' : request}).data
     return response
