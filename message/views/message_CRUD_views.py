@@ -7,6 +7,7 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from ..permissions import IsParticipant
 from ..serializers.message_serializer import *
 from ..services.message_CRUD import *
 
@@ -41,7 +42,7 @@ class CreateMessageView(APIView):
 
 class DeleteMessagesView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsParticipant]
 
     @swagger_auto_schema(manual_parameters=[authorization_header], responses={"200":""})
     def delete(self, request, message_room_id):
@@ -59,7 +60,7 @@ class GetMessageListView(APIView):
 
 class GetSpecificMessageListView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsParticipant]
 
     @swagger_auto_schema(manual_parameters=[authorization_header], responses={"200":MessageResponseSerializer})
     def get(self, request, message_room_id):
