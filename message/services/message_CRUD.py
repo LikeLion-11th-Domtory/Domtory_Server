@@ -3,12 +3,9 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from board.models import Post, Comment
-from member.domains import Member
 from utils.exceptions.message_exception import MessageBlockedError, MessageToMeError
-from ..domains.message_block_models import MessageBlock
-from ..domains.message_models import Message, MessageRoom
-from ..serializers.message_serializer import MessageRequestSerializer, MessageResponseSerializer, \
-    MessageSimpleSerializer, MessageRoomResponseSerializer, MessageRoomRequestSerializer
+from ..domains import Message, MessageRoom, MessageBlock
+from ..serializers import MessageRoomRequestSerializer, MessageRoomResponseSerializer, MessageRequestSerializer, MessageResponseSerializer, MessageSimpleSerializer
 
 
 def get_message_detail(request, message_id):

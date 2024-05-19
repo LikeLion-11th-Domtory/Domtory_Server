@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from ..permissions import IsParticipant
-from ..serializers.message_serializer import *
-from ..services.message_CRUD import *
+from ..services import create_message_room, create_message, delete_messages, read_message, get_message_list, get_specific_message_list
+from ..serializers import MessageRoomRequestSerializer, MessageRequestSerializer, MessageResponseSerializer, MessageSimpleSerializer
 
 authorization_header = openapi.Parameter(
     'Authorization',

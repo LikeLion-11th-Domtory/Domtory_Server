@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..services.message_block import create_message_block
+from ..services import create_message_block
 
 authorization_header = openapi.Parameter(
     'Authorization',

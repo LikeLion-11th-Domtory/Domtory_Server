@@ -2,8 +2,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from member.domains import Member
-from message.domains.message_block_models import MessageBlock
-from message.serializers.message_serializer import MessageBlockRequestSerializer, MessageBlockResponseSerializer
+from ..domains import MessageBlock
+from ..serializers import MessageBlockRequestSerializer, MessageBlockResponseSerializer
 from utils.exceptions.message_exception import AlreadyBlockedError
 
 

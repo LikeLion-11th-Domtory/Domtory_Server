@@ -2,8 +2,7 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework import serializers
 
-from ..domains.message_block_models import MessageBlock
-from ..domains.message_models import Message, MessageRoom
+from ..domains import Message, MessageRoom, MessageBlock
 
 
 class MessageRequestSerializer(serializers.ModelSerializer):
