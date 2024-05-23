@@ -13,22 +13,15 @@ def get_message_detail(request, message_id):
     response = MessageResponseSerializer(message, context={'request' : request}).data
     return response
 
-
-def get_message_room(request, message_room_id):
-    message_room = get_object_or_404(MessageRoom, id = message_room_id)
-    response = MessageRoomResponseSerializer(message_room, context={'request' : request}).data
-    return response
-
-
 @transaction.atomic
-def create_message_room(request, post_id, comment_anonymous_number):
+def create_message_room(request, post_id, anonymous_number):
     is_from_comment = True
     post = Post.objects.get(pk=post_id)
     sender = request.user
     sender_id = sender.id
     # comment_anonymous_number가 0이면 게시글 작성자가, 1 이상이면 댓글 작성자가 최초 수신자
-    if comment_anonymous_number > 0:
-        comment = Comment.objects.get(post=post, anonymous_number=comment_anonymous_number)
+    if anonymous_number > 0:
+        comment = Comment.objects.get(post=post, anonymous_number=anonymous_number)
         target_id = comment.member_id
     else:
         is_from_comment = False
@@ -40,12 +33,11 @@ def create_message_room(request, post_id, comment_anonymous_number):
     except MessageRoom.DoesNotExist:
         message_room = None
 
-    # 이미 쪽지 기록이 존재할 때 => 리다이렉트용으로 message_room_id 리턴
+    # 이미 쪽지 기록이 존재할 때
     if message_room:
         response = {
             "message_room_id" : message_room.id
         }
-        return response
     # 쪽지 기록이 존재하지 않을 때 => 새로운 쪽지방 만들고 정보 리턴
     else:
         serializer = MessageRoomRequestSerializer(data = request.data)
@@ -54,10 +46,13 @@ def create_message_room(request, post_id, comment_anonymous_number):
             receiver_anonymous_num = -1
             if is_from_comment:
                 receiver_anonymous_num = comment.anonymous_number
-            message_info = serializer.save(post=post,
+            message_room = serializer.save(post=post,
                                              receiver_anonymous_num=receiver_anonymous_num,
                                              first_sender_id=sender_id, first_receiver_id=target_id)
-            return get_message_room(request, message_info.id)
+            response = {
+                "message_room_id": message_room.id
+            }
+    return response
 
 
 @transaction.atomic
@@ -141,6 +136,10 @@ def get_message_list(request):
     response = MessageSimpleSerializer(recent_messages, many=True, context={'request' : request}).data
     return response
 
+def get_message_room(request, message_room_id):
+    message_room = get_object_or_404(MessageRoom, id = message_room_id)
+    response = MessageRoomResponseSerializer(message_room, context={'request' : request}).data
+    return response
 
 def get_specific_message_list(request, message_room_id):
     user = request.user
