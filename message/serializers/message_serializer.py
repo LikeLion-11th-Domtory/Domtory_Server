@@ -68,14 +68,11 @@ class MessageRoomRequestSerializer(serializers.ModelSerializer):
         fields = []
 
 class MessageRoomResponseSerializer(serializers.ModelSerializer):
-    post_title = serializers.SerializerMethodField()
 
     class Meta:
         model = MessageRoom
-        fields = ['id', 'post_title', 'receiver_anonymous_num']
+        fields = ['id', 'board', 'post_title', 'receiver_anonymous_num']
 
-    def get_post_title(self, obj):
-        return obj.post.title
 
 class MessageBlockResponseSerializer(serializers.ModelSerializer):
     class Meta:

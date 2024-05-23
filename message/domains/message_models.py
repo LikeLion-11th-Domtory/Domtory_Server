@@ -9,6 +9,8 @@ class MessageRoom(models.Model):
     쪽지 시작점 참고를 위한 모델
     """
     post = models.ForeignKey(Post, null=True, on_delete=models.SET_NULL, verbose_name='쪽지 시작점 게시글', related_name='message_post')
+    board = models.CharField(max_length=60, default="", verbose_name='쪽지 시작점 게시글의 게시판')
+    post_title = models.CharField(max_length=90, default="", verbose_name='쪽지 시작점 게시글 제목')
     receiver_anonymous_num = models.IntegerField(verbose_name='최초수신자 익명 숫자') # 0이면 게시글 작성자, 1 이상이면 댓글 작성자
     first_sender = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL, verbose_name='최초발신자', related_name='first_message_sender')
     first_receiver = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL, verbose_name='최초수신자',
