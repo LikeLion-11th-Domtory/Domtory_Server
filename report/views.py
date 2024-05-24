@@ -24,6 +24,11 @@ class CreateReportView(APIView):
             target = Comment.objects.get(pk=target_id)
             data = request.data.copy()
             data['comment'] = target_id
+
+        elif target_type == "message":
+            target = Message.objects.get(pk=target_id)
+            data = request.data.copy()
+            data['message'] = target_id
         
         serializer = ReportSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
