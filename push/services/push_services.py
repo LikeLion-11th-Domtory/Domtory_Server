@@ -75,7 +75,7 @@ class PushService:
 
         title_dict = {
             4 : f'🐿️ ⚡️새로운 번개모임⚡️이 생겼어요!',
-            5 : f'🐿️ 분실물 게시판에 글이 올라왔어요! 🥹🔎',
+            5 : f'🐿️ 분실물 게시판에 글이 올라왔어요!',
             6 : f'🐿️ 새로운 자율회 공지사항이에요! 📢'
         }
         title = title_dict.get(post.board_id)
