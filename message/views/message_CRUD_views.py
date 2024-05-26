@@ -24,7 +24,7 @@ class CreateMessageRoomView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(manual_parameters=[authorization_header], request_body=MessageRoomRequestSerializer, responses={"200":"message_room_id"})
+    @swagger_auto_schema(manual_parameters=[authorization_header], responses={"200":"message_room_id"})
     def get(self, request, post_id, anonymous_number):
         response = create_message_room(request, post_id, anonymous_number)
         return Response(response, status=status.HTTP_200_OK)
