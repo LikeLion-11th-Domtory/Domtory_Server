@@ -42,8 +42,7 @@ def create_message_room(request, post_id, anonymous_number):
     else:
         serializer = MessageRoomRequestSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
-            post = Post.objects.get(pk=post_id)
-            receiver_anonymous_num = -1
+            receiver_anonymous_num = 0
             if is_from_comment:
                 receiver_anonymous_num = comment.anonymous_number
             message_room = serializer.save(post=post, post_title = post.title, board = post.board,
