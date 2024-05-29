@@ -16,6 +16,8 @@ class MessageRoom(models.Model):
     first_receiver = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL, verbose_name='최초수신자',
                                  related_name='first_message_receiver')
 
+    class Meta:
+        db_table = 'message_room'
 
 class Message(models.Model):
     """
@@ -29,3 +31,9 @@ class Message(models.Model):
     is_read = models.BooleanField(default=False)
     is_deleted_send = models.BooleanField(default=False)
     is_deleted_recv = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.body
+
+    class Meta:
+        db_table = 'message'
