@@ -4,6 +4,7 @@ from member.serializers import (
                             SigninRequestSerialzier,
                             SigninResponseSerializer,
                             PasswordChangeRequestSerializer,
+                            MemberInfoSerializer,
                         )
 from member.domains import Member
 from django.contrib.auth.hashers import check_password, make_password
@@ -65,6 +66,10 @@ class MemberService:
         self._can_change_password(old_password, new_password, request_user.password)
         request_user.set_password(new_password)
         self._member_repository.save_member(request_user)
+
+    def get_member_info(self, member: Member):
+        member_info_serializer = MemberInfoSerializer(member)
+        return member_info_serializer.data
 
     def _save_dormitory_card_image(self, signup_data):
         s3_conn = S3Connect()

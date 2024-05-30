@@ -3,4 +3,5 @@ from .member_serializer import (
                             SigninRequestSerialzier,
                             SigninResponseSerializer,
                             PasswordChangeRequestSerializer,
+                            MemberInfoSerializer,
                         )
