@@ -3,7 +3,8 @@ from member.presentations import (
                                     SignUpView,
                                     SigninView,
                                     WithdrawalView,
-                                    PasswordChangeView
+                                    PasswordChangeView,
+                                    MemberInfoView,
                                 )
 
 app_name = 'member'
@@ -13,4 +14,5 @@ urlpatterns = [
     path('signin/', SigninView.as_view(), name='signin'),
     path('withdrawal/', WithdrawalView.as_view(), name='withdrawal'),
     path('password/change/', PasswordChangeView.as_view(), name='password_change'),
+    path('info/', MemberInfoView.as_view(), name='member_info'),
 ]
