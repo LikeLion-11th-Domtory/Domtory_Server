@@ -1,4 +1,7 @@
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from .models import *
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -59,6 +62,35 @@ class CommentAdmin(admin.ModelAdmin):
         return timezone.localtime(obj.created_at)
     get_created_at.short_description = '작성 시각'
 
+    def save_model(self, request, obj, form, change):
+        if change and 'is_deleted' in form.changed_data:
+            post = obj.post
+            if obj.is_deleted == True and post.comment_cnt > 0:
+                post.comment_cnt -= 1
+            else:
+                post.comment_cnt += 1
+            post.save()
+        if not change:
+            post = obj.post
+            post.comment_cnt += 1
+            post.save()
+        super().save_model(request, obj, form, change)
+
+    def delete_model(self, request, obj):
+        post = obj.post
+        if post.comment_cnt > 0:
+            post.comment_cnt -= 1
+            post.save()
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            post = obj.post
+            if post.comment_cnt > 0:
+                post.comment_cnt -= 1
+                post.save()
+            obj.delete()
+        
 
 admin.site.register(Board, BoardAdmin)
 admin.site.register(Post, PostAdmin)
