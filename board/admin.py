@@ -1,9 +1,4 @@
-from typing import Any
 from django.contrib import admin, messages
-from django.db.models.fields.related import ForeignKey
-from django.db.models.query import QuerySet
-from django.forms.models import ModelChoiceField
-from django.http import HttpRequest
 from .models import *
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
