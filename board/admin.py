@@ -1,6 +1,8 @@
 from typing import Any
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.db.models.fields.related import ForeignKey
 from django.db.models.query import QuerySet
+from django.forms.models import ModelChoiceField
 from django.http import HttpRequest
 from .models import *
 from django.utils.translation import gettext_lazy as _
@@ -53,6 +55,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('body', 'get_member_name', 'post', 'get_created_at')
     list_display_links = ('body', 'post', 'get_member_name')
     search_fields = ['post__title', 'member__name']
+    fields = ('post', 'parent', 'body')
     
     def get_member_name(self, obj):
         return obj.member.name
@@ -63,17 +66,40 @@ class CommentAdmin(admin.ModelAdmin):
     get_created_at.short_description = '작성 시각'
 
     def save_model(self, request, obj, form, change):
-        if change and 'is_deleted' in form.changed_data:
+        if obj.parent:
             post = obj.post
+            if obj.parent.post != obj.post:
+                self.message_user(request, "선택한 게시글에 작성된 댓글을 선택해주세요.", level=messages.ERROR)
+                return
+        if change and 'is_deleted' in form.changed_data:
             if obj.is_deleted == True and post.comment_cnt > 0:
                 post.comment_cnt -= 1
             else:
                 post.comment_cnt += 1
             post.save()
         if not change:
-            post = obj.post
             post.comment_cnt += 1
             post.save()
+
+            comments = post.comment.all()
+            anonymous_number = 0
+
+            if request.user != post.member:
+                flag = False
+
+                for comment in comments:
+                    if comment.member == request.user:
+                        anonymous_number = comment.anonymous_number
+                        flag = True
+                        break
+                    if anonymous_number < comment.anonymous_number:
+                        anonymous_number = comment.anonymous_number
+
+                if flag == False:
+                    anonymous_number += 1
+            obj.member = request.user
+            obj.anonymous_number = anonymous_number
+
         super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
