@@ -9,6 +9,7 @@ from boto3.dynamodb.conditions import Key
 from push.serializers import PushListResponseSerializer, PushCheckRequestSerialzier
 from board.models import Post
 from member.domains import MemberRepository
+from message.domains import MessageRoom, Message
 
 class PushService:
     def __init__(self, push_repository: PushRepository, board_repository: BoardRepository, member_repository: MemberRepository):
@@ -90,6 +91,18 @@ class PushService:
         member_ids = {valid_device.member_id for valid_device in valid_devices}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         return self._wrapping_notification_data(member_ids, title, body, valid_device_tokens)
+    
+    def make_message_push_notification_data(self, event: str, message: Message):
+        message_room = MessageRoom.objects.get(id=message.message_room_id)
+        if message_room:
+            title = f"🐿️ {message_room.board}에서 쪽지가 도착했어요!"
+            body = message.body[:10] + "..."
+        valid_devices = self._push_repository.find_devices_by_member_id(message.sender_id)
+        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
+        data = {
+            "messageRoomId": str(message.id)
+        }
+        return self._wrapping_notification_data([message.sender_id], title, body, valid_device_tokens, data)
     
     def make_multicast_message(self, notification_data: dict):
         multicast_extra_data = {
