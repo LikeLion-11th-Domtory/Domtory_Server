@@ -96,7 +96,10 @@ class PushService:
         message_room = MessageRoom.objects.get(id=message.message_room_id)
         if message_room:
             title = f"🐿️ {message_room.board}에서 쪽지가 도착했어요!"
-            body = message.body[:10] + "..."
+            if len(message.body) >= 20:
+                body = message.body[:20] + "..."
+            else:
+                body = message.body
         valid_devices = self._push_repository.find_devices_by_member_id(message.sender_id)
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         data = {
