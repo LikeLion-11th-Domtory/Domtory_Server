@@ -103,7 +103,7 @@ class PushService:
         valid_devices = self._push_repository.find_devices_by_member_id(message.sender_id)
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         data = {
-            "messageRoomId": str(message.id)
+            "messageRoomId": str(message_room.id)
         }
         return self._wrapping_notification_data([message.sender_id], title, body, valid_device_tokens, data)
     
