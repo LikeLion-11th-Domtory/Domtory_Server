@@ -6,7 +6,7 @@ from board.models import Post, Comment
 from utils.exceptions.message_exception import MessageBlockedError, MessageToMeError
 from ..domains import Message, MessageRoom, MessageBlock
 from ..serializers import MessageRoomRequestSerializer, MessageRoomResponseSerializer, MessageRequestSerializer, MessageResponseSerializer, MessageSimpleSerializer
-
+from push.tasks import send_push_notification_handler
 
 def get_message_detail(request, message_id):
     message = get_object_or_404(Message, id = message_id)
@@ -80,6 +80,7 @@ def create_message(request, message_room_id):
         raise MessageToMeError
 
     message = serializer.save(sender=request.user, receiver=receiver, message_room=message_room)
+    send_push_notification_handler('message-notification-event', message=message)
     return get_message_detail(request, message.id)
 
 
