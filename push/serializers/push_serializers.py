@@ -12,6 +12,7 @@ class PushListResponseSerializer(serializers.Serializer):
     transformedPushedAt = serializers.CharField()
     boardId = serializers.IntegerField(allow_null=True)
     postId = serializers.IntegerField(allow_null=True)
+    messageRoomId = serializers.IntegerField(allow_null=True)
     isChecked = serializers.BooleanField()
 
 class PushCheckRequestSerialzier(serializers.Serializer):
