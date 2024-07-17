@@ -17,7 +17,7 @@ from report.services.create_report import *
 # Create your views here.
 
 class CreateReportView(APIView):
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request, target_type, target_id):
         response = create_report(request, target_type, target_id)
