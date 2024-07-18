@@ -7,7 +7,7 @@ class Dorm(models.Model):
     """
     DORM_LIST = DormList.get_choices()
 
-    dorm_name = models.CharField(max_length = 255, choices = DORM_LIST, verbose_name = "기숙사 이름", unique = True, null = False) # 한글 20글자
+    dorm_name = models.CharField(max_length = 255, choices = DORM_LIST, verbose_name = "기숙사 이름", unique = True, null = False)
     descriptions = models.CharField(max_length= 3*300, default = "", verbose_name = "비고") # 한글 300자
     
     def __str__(self):
