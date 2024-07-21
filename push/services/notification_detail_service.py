@@ -25,4 +25,6 @@ class NotificationDetailService:
         notification_detail.lightning_post = notification_detail_data.get('lightning_post')
         notification_detail.comment = notification_detail_data.get('comment')
         notification_detail.reply = notification_detail_data.get('reply')
+        notification_detail.lost_item = notification_detail_data.get('lost_item')
+        notification_detail.message = notification_detail_data.get('message')
         self._notification_detail_repository.save_notification_detail(notification_detail)

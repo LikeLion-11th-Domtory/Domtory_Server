@@ -10,6 +10,7 @@ class NotificationDetail(models.Model):
     comment = models.BooleanField(default=True)
     reply = models.BooleanField(default=True)
     lost_item = models.BooleanField(default=True)
+    message = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'notification_detail'

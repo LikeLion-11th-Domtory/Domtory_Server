@@ -100,12 +100,12 @@ class PushService:
                 body = message.body[:20] + "..."
             else:
                 body = message.body
-        valid_devices = self._push_repository.find_devices_by_member_id(message.sender_id)
-        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
+        valid_devices = self._push_repository.find_devices_with_member_and_notification_detail(message.receiver_id)
+        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices if valid_device.member.notificationdetail.message]
         data = {
             "messageRoomId": str(message_room.id)
         }
-        return self._wrapping_notification_data([message.sender_id], title, body, valid_device_tokens, data)
+        return self._wrapping_notification_data([message.receiver_id], title, body, valid_device_tokens, data)
     
     def make_multicast_message(self, notification_data: dict):
         multicast_extra_data = {
