@@ -23,25 +23,25 @@ class DormList(Enum):
         return self.value[0]
     
     @classmethod
-    def get_names(self):
+    def get_names(cls):
         """
         DormList.get_names()
         = ('ALL', 'EAST', 'WEST')
         """
-        return tuple(self._member_names_)
+        return tuple(cls._member_names_)
     
     @classmethod
-    def get_values(self):
+    def get_values(cls):
         """
         DormList.get_values()
         = (('전체 기숙사', 1), ('동서울관', 2), ('서서울관', 3))
         """
-        return tuple(member.value for member in self)
+        return tuple(member.value for member in cls)
     
     @classmethod
-    def get_choices(self):
+    def get_choices(cls):
         """
         DormList.get_choices()
         = (('ALL', '전체 기숙사'), ('EAST', '동서울관'), ('WEST', '서서울관'))
         """
-        return tuple((member.name, member.value[0]) for member in self)
+        return tuple((member.name, member.value[0]) for member in cls)
