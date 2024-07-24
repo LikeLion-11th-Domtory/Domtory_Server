@@ -4,7 +4,7 @@ from member.domains.member import Member
 from board.models.post_models import Post
 from board.models.comment_models import Comment
 
-from report.services.unban_member_status import unban_member_status
+from report.services.unban_member_status import async_unban_member_status
 
 from django.urls import reverse
 from django.utils.html import format_html
@@ -99,7 +99,7 @@ class ReportAdmin(admin.ModelAdmin):
                     obj.post.member.save()
 
                     #n일 후에 차단 해제되는 로직 실행
-                    unban_member_status(obj.post.member.id, int(obj.member_status))
+                    async_unban_member_status(obj.id, obj.member_status)
 
                     
             
@@ -118,7 +118,7 @@ class ReportAdmin(admin.ModelAdmin):
                     obj.comment.member.save()
 
                     #n일 후에 차단 해제되는 로직 실행
-                    unban_member_status(obj.post.member.id, int(obj.member_status))
+                    async_unban_member_status(obj.id, obj.member_status)
 
         super().save_model(request, obj, form, change)
 
@@ -127,6 +127,14 @@ class ReportAdmin(admin.ModelAdmin):
         ('ACTIVE','활동'),
         ('BANNED', '정지'),
         ('WITHDRAWAL', '탈퇴')
+    )
+    """
+    """
+    MEMBER_BLOCK_CHOICES = (
+        (0, '정지하지 않음'),
+        (3, '3일 정지'),
+        (7, '7일 정지'),
+        (30, '30일 정지')
     )
     """
 
