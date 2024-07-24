@@ -7,14 +7,6 @@ from member.models import Member
 # Create your models here.
 
 class Report(models.Model):
-    # class ReportType(models.TextChoices):
-    #     WAITING = "WAITING", "검사 대기"
-    #     PENDING = "PENDING", "관리자 확인 대기"
-    #     VALID = "VALID", "유효한 신고"
-    #     INVALID = "INVALID", "유효하지 않은 신고"
-    # class MemberType(models.TextChoices):
-    #     BANNED = 'BANNED', "유저 정지"
-    #     ACTIVE = 'ACTIVE', "유저 정지 해제"
     REPORT_TYPE_CHOICES = (
         ("WAITING", "검사 대기"),
         ("PENDING", "관리자 확인 대기"),

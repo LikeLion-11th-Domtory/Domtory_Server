@@ -13,9 +13,9 @@ from django.utils.html import format_html
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ['id', 'status', 'reported_at', 'target',]
+    list_display = ['id', 'status', 'reported_at', 'target', 'member_status']
     list_display_links = ['status', 'target',]
-    list_filter = ['status']
+    list_filter = ['status', 'member_status']
 
     actions = ["action_change_report_status", ##Report.status의 상태변화
                "action_change_member_status"] ##Report.member_status의 상태변화 
@@ -32,8 +32,6 @@ class ReportAdmin(admin.ModelAdmin):
             return obj.comment.body
     target_body.short_description = '신고 내용'
 
-
-
     ## 신고 목록 필드 중 신고당한 글 객체 필드
     def target(self, obj):
         if obj.post:
@@ -45,15 +43,7 @@ class ReportAdmin(admin.ModelAdmin):
         
     target.short_description = '신고글'
 
-    # def user_status(self, obj):
-    #     if obj.post:
-    #         link = reverse('admin:member_member_change', args=[obj.post.id])
-    #         return format_html('<a href="{}">{}</a>', link, f"유저")
-    #     elif obj.comment:
-    #         link = reverse('admin:member_member_change', args=[obj.comment.id])
-    #         return format_html('<a href="{}">{}</a>', link, f"유저")
-    
-    
+
     """
     admin에서 관리자가 설정하는 값을 객체에 넣음
     """
@@ -87,38 +77,41 @@ class ReportAdmin(admin.ModelAdmin):
             if obj.post:
                 if obj.status == Report.REPORT_TYPE_CHOICES[2][0]: # 유효한 신고일 때 - 신고글 정지
                     obj.post.is_blocked = True
-
-                    obj.post.save()
+                elif obj.status == Report.REPORT_TYPE_CHOICES[3][0]: # 유효한 신고 취소
+                    obj.post.is_blocked = False
 
                 if obj.member_status != Report.MEMBER_BLOCK_CHOICES[0][0]: # 유저 정지 했을때 - 유저, 신고글 함께 정지
                     obj.post.member.status = Member.MEMBER_STATUS_CHOICES[1][0]
                     obj.status = Report.REPORT_TYPE_CHOICES[2][0]
                     obj.post.is_blocked = True
 
-                    obj.post.save()
-                    obj.post.member.save()
-
                     #n일 후에 차단 해제되는 로직 실행
                     async_unban_member_status(obj.id, obj.member_status)
-
+                else: # 유저 정지 취소
+                    obj.post.member.status = Member.MEMBER_STATUS_CHOICES[0][0]
+                
+                obj.post.save()
+                obj.post.member.save()
                     
             
             if obj.comment:
                 if obj.status == Report.REPORT_TYPE_CHOICES[2][0]: # 유효한 신고일 때 - 신고글 정지
                     obj.comment.is_blocked = True
-
-                    obj.comment.save()
+                elif obj.status == Report.REPORT_TYPE_CHOICES[3][0]: # 유효한 신고 취소
+                    obj.comment.is_blocked = False
 
                 if obj.member_status != Report.MEMBER_BLOCK_CHOICES[0][0]: # 유저 정지 했을때 - 유저, 신고글 함께 정지
                     obj.comment.member.status = Member.MEMBER_STATUS_CHOICES[1][0]
                     obj.status = Report.REPORT_TYPE_CHOICES[2][0]
                     obj.comment.is_blocked = True
 
-                    obj.comment.save()
-                    obj.comment.member.save()
-
                     #n일 후에 차단 해제되는 로직 실행
                     async_unban_member_status(obj.id, obj.member_status)
+                else: # 유저 정지 취소
+                    obj.comment.member.status = Member.MEMBER_STATUS_CHOICES[0][0]
+                
+                obj.comment.save()
+                obj.comment.member.save()
 
         super().save_model(request, obj, form, change)
 
@@ -137,6 +130,13 @@ class ReportAdmin(admin.ModelAdmin):
         (30, '30일 정지')
     )
     """
+    """
+    REPORT_TYPE_CHOICES = (
+        ("WAITING", "검사 대기"),
+        ("PENDING", "관리자 확인 대기"),
+        ("VALID", "유효한 신고"),
+        ("INVALID", "유효하지 않은 신고")
+    )"""
 
 
 admin.site.register(Report, ReportAdmin)
