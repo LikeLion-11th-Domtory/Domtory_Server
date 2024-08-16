@@ -23,6 +23,11 @@ class SigninRequestSerialzier(serializers.ModelSerializer):
         model = Member
         fields = ('username', 'password')
 
+class MemberInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ('id', 'username', 'phone_number', 'name', 'dorm', 'birthday', 'status', 'is_staff', 'is_superuser')
+
 class _MemberResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member

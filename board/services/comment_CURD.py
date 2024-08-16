@@ -53,8 +53,9 @@ def delete_comment(request, comment_id):
     post = comment.post
     comment.is_deleted = True
     comment.save()
-    post.comment_cnt -= 1
-    post.save()
+    if post.comment_cnt > 0:
+        post.comment_cnt -= 1
+        post.save()
     response = get_post_detail(request, post.pk)
     return response
 

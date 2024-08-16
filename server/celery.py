@@ -8,7 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', config('DJANGO_SETTINGS_MODULE')
 app = Celery('domtory')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-app.autodiscover_tasks(['push.tasks',])
+app.autodiscover_tasks(['push.tasks', 'report.tasks'])
 
 app.conf.broker_transport_options = {'visibility_timeout': 31536000}
 

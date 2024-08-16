@@ -43,6 +43,12 @@ class MemberCustomAdmin(admin.ModelAdmin):
     search_fields = ("name", "username")
     list_filter = ['status']
 
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super().get_queryset(request)
+        queryset = super().get_queryset(request)
+        return queryset.filter(dorm = request.user.dorm)
+
 class PersonalInfoExcelFiletAdmin(admin.ModelAdmin):
     list_display = ['excel_file', 'created_at']
     list_display_links = ['created_at']

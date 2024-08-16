@@ -9,6 +9,7 @@ from boto3.dynamodb.conditions import Key
 from push.serializers import PushListResponseSerializer, PushCheckRequestSerialzier
 from board.models import Post
 from member.domains import MemberRepository
+from message.domains import MessageRoom, Message
 
 class PushService:
     def __init__(self, push_repository: PushRepository, board_repository: BoardRepository, member_repository: MemberRepository):
@@ -54,15 +55,19 @@ class PushService:
         return self._wrapping_notification_data(member_ids, title, comment.body, device_tokens, data)
 
     def make_post_push_notification_data(self, event: str, post_id: int):
+        notification_setting_map = {
+            4: 'lightning_post',
+            5: 'lost_item'
+        }
         post: Post = self._board_repository.find_post_by_id(post_id)
-       
-        if post.board_id == 4:
+        notification_setting = notification_setting_map.get(post.board_id)
+        if notification_setting:
             valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail()
             member_ids = {
-                valid_device.member_id for valid_device in valid_devices if valid_device.member.notificationdetail.lightning_post
+                valid_device.member_id for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, notification_setting)
             }
             valid_device_tokens = [
-                valid_device.device_token for valid_device in valid_devices if valid_device.member.notificationdetail.lightning_post
+                valid_device.device_token for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, notification_setting)
             ]
         else:
             valid_devices = self._push_repository.find_all_devices()
@@ -71,6 +76,7 @@ class PushService:
 
         title_dict = {
             4 : f'🐿️ ⚡️새로운 번개모임⚡️이 생겼어요!',
+            5 : f'🐿️ 분실물 게시판에 글이 올라왔어요!',
             6 : f'🐿️ 새로운 자율회 공지사항이에요! 📢'
         }
         title = title_dict.get(post.board_id)
@@ -85,6 +91,21 @@ class PushService:
         member_ids = {valid_device.member_id for valid_device in valid_devices}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         return self._wrapping_notification_data(member_ids, title, body, valid_device_tokens)
+    
+    def make_message_push_notification_data(self, event: str, message: Message):
+        message_room = MessageRoom.objects.get(id=message.message_room_id)
+        if message_room:
+            title = f"🐿️ {message_room.board}에서 쪽지가 도착했어요!"
+            if len(message.body) >= 20:
+                body = message.body[:20] + "..."
+            else:
+                body = message.body
+        valid_devices = self._push_repository.find_devices_with_member_and_notification_detail(message.receiver_id)
+        valid_device_tokens = [valid_device.device_token for valid_device in valid_devices if valid_device.member.notificationdetail.message]
+        data = {
+            "messageRoomId": str(message_room.id)
+        }
+        return self._wrapping_notification_data([message.receiver_id], title, body, valid_device_tokens, data)
     
     def make_multicast_message(self, notification_data: dict):
         multicast_extra_data = {
@@ -108,7 +129,7 @@ class PushService:
         # member_ids가 존재하지 않으면, 저장할 필요가 없다. 본인 글에 본인이 댓글, 대댓글을 단 경우이다.
         member_ids: set | None = notification_data.get('member_ids')
         if not member_ids:
-            return
+            return notification_data
         pushed_at = str(datetime.now())
         item = {
             'pushedAt': pushed_at,
