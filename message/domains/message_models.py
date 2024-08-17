@@ -1,3 +1,4 @@
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 from board.models import Post
@@ -26,7 +27,7 @@ class Message(models.Model):
     message_room = models.ForeignKey(MessageRoom, null=True, on_delete=models.SET_NULL, verbose_name='쪽지방', related_name='message_room')
     sender = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL, verbose_name='송신자', related_name='message_sender')
     receiver = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL, verbose_name='수신자', related_name='message_receiver')
-    body = models.TextField(default="", verbose_name='내용')
+    body = models.TextField(default="", validators=[MinLengthValidator(1)], verbose_name='내용')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='전송일시')
     is_read = models.BooleanField(default=False)
     is_deleted_send = models.BooleanField(default=False)
