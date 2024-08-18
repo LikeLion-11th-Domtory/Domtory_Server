@@ -26,6 +26,12 @@ def unban_member_task(self, report_id):
 
                 logging.info(f"Successfully unbanned member id {report.comment.member.id}")
 
+            elif report.message:
+                report.message.sender.status = Member.MEMBER_STATUS_CHOICES[0][0]
+                report.message.sender.save()
+
+                logging.info(f"Successfully unbanned member id {report.message.sender.id}")
+
             report.save()
 
     except Exception as e:

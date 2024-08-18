@@ -30,6 +30,8 @@ class ReportAdmin(admin.ModelAdmin):
             return obj.post.body
         elif obj.comment:
             return obj.comment.body
+        elif obj.message:
+            return obj.message.body
     target_body.short_description = '신고 내용'
 
     ## 신고 목록 필드 중 신고당한 글 객체 필드
@@ -40,7 +42,10 @@ class ReportAdmin(admin.ModelAdmin):
         elif obj.comment:
             link = reverse('admin:board_comment_change', args=[obj.comment.id])
             return format_html('<a href="{}">{}</a>', link, f"댓글 신고 : {obj.comment.body}")
-        
+        elif obj.message:
+            link = reverse('admin:message_message_change', args=[obj.message.id])
+            return format_html('<a href="{}">{}</a>', link, f"쪽지 신고 : {obj.message.body}")
+
     target.short_description = '신고글'
 
 
@@ -112,6 +117,10 @@ class ReportAdmin(admin.ModelAdmin):
                 
                 obj.comment.save()
                 obj.comment.member.save()
+
+            if obj.message:
+                if obj.member_status != Report.MEMBER_BLOCK_CHOICES[0][0]: # 유저 정지 했을때 - 유저 정지
+                    obj.message.sender.status = Member.MEMBER_STATUS_CHOICES[1][0]
 
         super().save_model(request, obj, form, change)
 
