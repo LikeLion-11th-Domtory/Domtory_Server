@@ -30,3 +30,6 @@ class PushRepository:
         member_id에 있는 member_id들에 해당되는 Device 객체를 불러옴
         """
         return Device.objects.filter(member_id__in=member_ids)
+    
+    def find_devices_with_member_and_notification_detail(self, member_id: int):
+        return Device.objects.filter(member_id=member_id).select_related('member', 'member__notificationdetail')

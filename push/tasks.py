@@ -3,6 +3,7 @@ from server.celery import app
 from push.containers import PushContainer
 import logging
 from utils.exceptions import FCMSendException
+from message.domains import Message
 
 class RetryTask(Task):
     acks_late = True
@@ -16,7 +17,8 @@ def send_push_notification_handler(
         comment_id: int=None,
         post_id: int=None,
         title: str=None,
-        body: str=None
+        body: str=None,
+        message: Message=None
     ):
     try:
         push_service = PushContainer.push_service()
@@ -31,6 +33,8 @@ def send_push_notification_handler(
             notification_data = push_service.make_post_push_notification_data(event, post_id)
         elif event == 'admin-notification-event':
             notification_data = push_service.make_admin_push_notification_data(event, title, body)
+        elif event == 'message-notification-event':
+            notification_data = push_service.make_message_push_notification_data(event, message)
 
         # 식단 알림은 저장하지 않는다.
         if event != 'menu-scheule-event':

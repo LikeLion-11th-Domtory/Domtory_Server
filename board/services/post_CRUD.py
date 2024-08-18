@@ -35,7 +35,7 @@ def create_post(request, board_id):
     serializer.is_valid(raise_exception=True)
     post = serializer.save(member = request.user, board = board)
 
-    if post.board_id == 4:
+    if post.board_id in (4, 5):
         send_push_notification_handler.delay('post-notification-event', post_id=post.id)
     elif post.board_id == 6:
         send_push_notification_handler.delay('post-notification-event', post_id=post.id)

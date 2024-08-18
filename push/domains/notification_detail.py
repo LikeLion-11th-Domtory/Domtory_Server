@@ -9,6 +9,8 @@ class NotificationDetail(models.Model):
     lightning_post = models.BooleanField(default=True)
     comment = models.BooleanField(default=True)
     reply = models.BooleanField(default=True)
+    lost_item = models.BooleanField(default=True)
+    message = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'notification_detail'
