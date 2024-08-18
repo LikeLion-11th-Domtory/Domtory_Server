@@ -130,6 +130,10 @@ class ReportAdmin(admin.ModelAdmin):
             if obj.message:
                 if obj.member_status != Report.MEMBER_BLOCK_CHOICES[0][0]: # 유저 정지 했을때 - 유저 정지
                     obj.message.sender.status = Member.MEMBER_STATUS_CHOICES[1][0]
+                    # n일 후에 차단 해제되는 로직 실행
+                    async_unban_member_status(obj.id, obj.member_status)
+                else:  # 유저 정지 취소
+                    obj.message.sender.status = Member.MEMBER_STATUS_CHOICES[0][0]
 
         super().save_model(request, obj, form, change)
 
