@@ -3,18 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
-from ..services import (unpaginated_post_list,
-                        paginated_post_list,
-                        recent_posts_in_all_boards,
-                        recent_posts_in_board,
-                        my_posts,
-                        my_comments,
-                        paginated_my_posts_list,
-                        paginated_my_comments)
-
+from ..services import *
 
 class PostListView(APIView):
     """
+    deprecated
     게시판별 리스트 뷰
     """
     authentication_classes = [JWTAuthentication]
@@ -27,6 +20,7 @@ class PostListView(APIView):
 
 class PaginatedPostListView(APIView):
     """
+    deprecated
     게시판별 리스트를 페이지네이션하여 반환
     """
     authentication_classes = [JWTAuthentication]
@@ -39,6 +33,7 @@ class PaginatedPostListView(APIView):
 
 class FreeBoardSimpleView(APIView):
     """
+    deprecated
     특정/전체 게시판의 최근 게시물을 출력하는 뷰
     """
     authentication_classes = [JWTAuthentication]
@@ -98,3 +93,30 @@ class PaginatedMyCommentView(APIView):
     def get(self, request):
         result = paginated_my_comments(request, request.user)
         return Response(result, status = status.HTTP_200_OK)
+
+
+class PostListByDormView(APIView):
+    """
+    유저의 기숙사에 맞는 게시판을 조회하는 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, board_id):
+        result = get_posts_by_dorm(request, board_id)
+        return Response(result, status = status.HTTP_200_OK)
+
+
+class RecentPostListView(APIView):
+    """
+    자신이 속한 기숙사의 자유게시판 최신 게시글 5개를 조회하는 뷰
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, board_id):
+        result = get_recent_posts_by_dorm(request, board_id)
+        return Response(result, status = status.HTTP_200_OK)
+
+
+
