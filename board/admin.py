@@ -1,4 +1,7 @@
 from django.contrib import admin, messages
+from django.db.models import Q
+
+from dorm.domains import Dorm
 from .models import *
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -32,7 +35,7 @@ class PostAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm = request.user.dorm)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
 
     def get_member_name(self, obj):
         return obj.member.name
@@ -51,7 +54,7 @@ class PostImageAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm = request.user.dorm)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
 
     def get_member_name(self, obj):
         return obj.post.member.name
@@ -68,7 +71,7 @@ class CommentAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm = request.user.dorm)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
     
     def get_member_name(self, obj):
         return obj.member.name
