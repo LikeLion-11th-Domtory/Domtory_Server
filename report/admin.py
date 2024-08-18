@@ -13,15 +13,15 @@ from django.utils.html import format_html
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ['id', 'status', 'reported_at', 'target', 'member_status']
+    list_display = ['id', 'status', 'reported_at', 'target', 'member_name', 'member_status']
     list_display_links = ['status', 'target',]
     list_filter = ['status', 'member_status']
 
     actions = ["action_change_report_status", ##Report.status의 상태변화
                "action_change_member_status"] ##Report.member_status의 상태변화 
 
-    fields = ('status', 'reported_at', 'target_body', 'member_status')
-    readonly_fields = ('reported_at', 'target_body')
+    fields = ('status', 'reported_at', 'target_body', 'member_name', 'member_status')
+    readonly_fields = ('reported_at', 'target_body', 'member_name')
 
 
     # 신고 객체에서 신고 내용 확인
@@ -47,6 +47,15 @@ class ReportAdmin(admin.ModelAdmin):
             return format_html('<a href="{}">{}</a>', link, f"쪽지 신고 : {obj.message.body}")
 
     target.short_description = '신고글'
+
+    def member_name(self, obj):
+        if obj.post:
+            return obj.post.member.name
+        elif obj.comment:
+            return obj.comment.member.name
+        elif obj.message:
+            return obj.message.sender.name
+    member_name.short_description = '신고 대상'
 
 
     """
