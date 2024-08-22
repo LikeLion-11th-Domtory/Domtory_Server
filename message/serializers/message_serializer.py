@@ -35,9 +35,10 @@ class MessageSimpleSerializer(serializers.ModelSerializer):
     is_received = serializers.SerializerMethodField()
     new_messages_cnt = serializers.SerializerMethodField()
     message_room_id = serializers.SerializerMethodField()
+    counterpart = serializers.SerializerMethodField()
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'receiver', 'body', 'created_at', 'is_read', 'is_received', 'new_messages_cnt', 'message_room_id']
+        fields = ['id', 'sender', 'receiver', 'counterpart', 'body', 'created_at', 'is_read', 'is_received', 'new_messages_cnt', 'message_room_id']
 
     def get_created_at(self, obj):
         time = timezone.localtime(obj.created_at)
@@ -49,6 +50,12 @@ class MessageSimpleSerializer(serializers.ModelSerializer):
             if request.user == obj.receiver:
                 return True
         return False
+    
+    def get_counterpart(self, obj):
+        if self.get_is_received(obj):
+            return obj.sender_id
+        else:
+            return obj.receiver_id
 
     def get_new_messages_cnt(self, obj):
         request = self.context.get('request')
