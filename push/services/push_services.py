@@ -86,8 +86,8 @@ class PushService:
         }
         return self._wrapping_notification_data(member_ids, title, post.title, valid_device_tokens, data)
 
-    def make_admin_push_notification_data(self, event: str, title: str, body: str):
-        valid_devices = self._push_repository.find_all_devices()
+    def make_admin_push_notification_data(self, event: str, title: str, body: str, dorm_id: int):
+        valid_devices = self._push_repository.find_all_devices_by_dorm_id(dorm_id=dorm_id)
         member_ids = {valid_device.member_id for valid_device in valid_devices}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
         return self._wrapping_notification_data(member_ids, title, body, valid_device_tokens)
