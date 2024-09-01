@@ -33,7 +33,7 @@ def send_push_notification_handler(
         elif event == 'post-notification-event':
             notification_data = push_service.make_post_push_notification_data(event, post_id)
         elif event == 'admin-notification-event':
-            notification_data = push_service.make_admin_push_notification_data(event, title, body)
+            notification_data = push_service.make_admin_push_notification_data(event, title, body, dorm_id)
         elif event == 'message-notification-event':
             notification_data = push_service.make_message_push_notification_data(event, message)
 
