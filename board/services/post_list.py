@@ -121,10 +121,16 @@ def paginated_my_comments(request, user):
 """
 def get_recent_posts_by_dorm(request, board_id):
     user = request.user
-    posts = Post.objects.filter(
-        Q(board__pk = board_id)&Q(dorm__pk = user.dorm_id)
-        &Q(is_blocked = False)&Q(is_deleted = False)
-    ).order_by('-created_at')[:5]
+    if board_id != 0:
+        posts = Post.objects.filter(
+            Q(board__pk = board_id)&Q(dorm__pk = user.dorm_id)
+            &Q(is_blocked = False)&Q(is_deleted = False)
+        ).order_by('-created_at')[:5]
+    else:
+        posts = Post.objects.filter(
+            Q(is_blocked = False)&Q(is_deleted = False)
+            &(Q(board__pk = 7)|Q(dorm__pk = user.dorm.id))
+        ).order_by('-created_at')[:5]
     serializer = PostSimpleSerializer(posts, many = True)
     return serializer.data
 

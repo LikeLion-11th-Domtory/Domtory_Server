@@ -10,11 +10,11 @@ class PushRepository:
     def find_device_by_token_and_member(self, device_token: str, member: Member):
         return get_object_or_404(Device, device_token=device_token, member=member)
     
-    def find_all_devices_with_member_and_notification_detail(self):
-        return Device.objects.select_related('member', 'member__notificationdetail').all().distinct()
+    def find_all_devices_with_member_and_notification_detail(self, dorm_id: int):
+        return Device.objects.select_related('member', 'member__notificationdetail').filter(member__dorm_id=dorm_id).distinct()
     
-    def find_all_devices(self):
-        return Device.objects.all().distinct()
+    def find_all_devices_by_dorm_id(self, dorm_id: int):
+        return Device.objects.select_related('member').filter(member__dorm_id=dorm_id).distinct()
     
     def find_all_devices_by_member_id(self, member_id: int):
         pass
