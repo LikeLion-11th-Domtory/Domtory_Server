@@ -140,10 +140,16 @@ def get_recent_posts_by_dorm(request, board_id):
 """
 def get_posts_by_dorm(request, board_id):
     user = request.user
-    posts = Post.objects.filter(
-        Q(board__pk = board_id)&Q(dorm__pk = user.dorm_id)
-        &Q(is_blocked = False)&Q(is_deleted = False)
-    ).order_by('-created_at')
+    if board_id != 7:
+        posts = Post.objects.filter(
+            Q(board__pk = board_id)&Q(dorm__pk = user.dorm_id)
+            &Q(is_blocked = False)&Q(is_deleted = False)
+        ).order_by('-created_at')
+    else:
+        posts = Post.objects.filter(
+            Q(board__pk = 7)
+            &Q(is_blocked = False)&Q(is_deleted = False)
+        ).order_by('-created_at')
     paginator = PostPageNumberPagination()
     page = paginator.paginate_queryset(posts, request)
     serializer = PostSimpleSerializer(page, many = True)
