@@ -9,7 +9,7 @@ class Comment(models.Model):
     member = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, verbose_name = '작성자', related_name = 'comment')
     post = models.ForeignKey(Post, null = False, blank = True, on_delete = models.CASCADE, verbose_name = '게시글', related_name = 'comment')
     parent = models.ForeignKey('self', null = True, blank = True, on_delete = models.PROTECT, verbose_name = '댓글', related_name = 'reply')
-    dorm = models.ForeignKey('dorm.Dorm', null = False, on_delete = models.CASCADE, verbose_name = '기숙사', default = 2, related_name = 'comment')
+    dorm = models.ForeignKey('dorm.Dorm', null = True, on_delete = models.SET_NULL, verbose_name = '기숙사', related_name = 'comment')
     body = models.TextField(default = "", verbose_name = '내용', null = False)
     anonymous_number = models.IntegerField(default = 1)
     created_at = models.DateTimeField(auto_now_add = True, verbose_name = '작성일시')

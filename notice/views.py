@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .models import NoticeList
 from .serializers import NoticeListSerializer
 from rest_framework import generics
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import *
 
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -24,13 +26,21 @@ class PostPageNumberPagination(PageNumberPagination):
 class NoticeListView(generics.ListAPIView):
     queryset = NoticeList.objects.all().order_by('-date')
     serializer_class = NoticeListSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     #페이지네이션
     pagination_class = PostPageNumberPagination
 
+    def get_queryset(self):
+        queryset = NoticeList.objects.filter(dorm = self.request.user.dorm)
+        return queryset
+
 class NoticeDetailView(generics.RetrieveAPIView):
     queryset = NoticeList.objects.all()
     serializer_class = NoticeListSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
 
 # class NoticeSearchView(generics.ListAPIView):

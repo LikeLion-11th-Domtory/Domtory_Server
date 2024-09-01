@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from board.models import Post, Comment
+from member.domains import Member
+from utils.exceptions import BannedMemberError, WithdrawedMemberError
 from utils.exceptions.message_exception import MessageBlockedError, MessageToMeError
 from ..domains import Message, MessageRoom, MessageBlock
 from ..serializers import MessageRoomRequestSerializer, MessageRoomResponseSerializer, MessageRequestSerializer, MessageResponseSerializer, MessageSimpleSerializer
@@ -76,6 +78,10 @@ def create_message(request, message_room_id):
         blocked = None
     if block or blocked:
         raise MessageBlockedError
+    if receiver.status == Member.MEMBER_STATUS_CHOICES[1][0]: # 수신자가 정지된 상태
+        raise BannedMemberError
+    elif receiver.status == Member.MEMBER_STATUS_CHOICES[2][0]: # 수신자가 탈퇴한 상태
+        raise WithdrawedMemberError
     if request.user == receiver:
         raise MessageToMeError
 
