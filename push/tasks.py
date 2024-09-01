@@ -18,7 +18,8 @@ def send_push_notification_handler(
         post_id: int=None,
         title: str=None,
         body: str=None,
-        message: Message=None
+        message: Message=None,
+        dorm_id: int=None
     ):
     try:
         push_service = PushContainer.push_service()
@@ -26,13 +27,13 @@ def send_push_notification_handler(
         
         # 받은 이벤트를 기반으로 분기해서 notification data를 만든다.  
         if event == 'menu-scheule-event': # 메뉴 알림일 때
-            notification_data = push_service.make_menu_push_notification_data(event, timezone)
+            notification_data = push_service.make_menu_push_notification_data(event, timezone, dorm_id)
         elif event == 'comment-notification-event': # 댓글 알림일 때
             notification_data = push_service.make_comment_push_notification_data(event, comment_id)
         elif event == 'post-notification-event':
             notification_data = push_service.make_post_push_notification_data(event, post_id)
         elif event == 'admin-notification-event':
-            notification_data = push_service.make_admin_push_notification_data(event, title, body)
+            notification_data = push_service.make_admin_push_notification_data(event, title, body, dorm_id)
         elif event == 'message-notification-event':
             notification_data = push_service.make_message_push_notification_data(event, message)
 

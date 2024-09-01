@@ -19,7 +19,8 @@ class AdminPushNotificationAdmin(admin.ModelAdmin):
         if push_body:
             if push_title == '' and notification_type in ('normal'):
                 return
-            send_push_notification_handler.delay('admin-notification-event', None, title=title, body=body)
+            dorm_id = request.user.dorm_id
+            send_push_notification_handler.delay('admin-notification-event', None, title=title, body=body, dorm_id=dorm_id)
         super().save_model(request, obj, form, change)
     
     def _make_push_title_and_body(self, notification_type: str, push_title: str, push_body: str):
