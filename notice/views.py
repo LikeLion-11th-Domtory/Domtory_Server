@@ -24,7 +24,6 @@ class PostPageNumberPagination(PageNumberPagination):
         ]))
     
 class NoticeListView(generics.ListAPIView):
-    queryset = NoticeList.objects.all().order_by('-date')
     serializer_class = NoticeListSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -33,7 +32,7 @@ class NoticeListView(generics.ListAPIView):
     pagination_class = PostPageNumberPagination
 
     def get_queryset(self):
-        queryset = NoticeList.objects.filter(dorm = self.request.user.dorm)
+        queryset = NoticeList.objects.filter(dorm = self.request.user.dorm).order_by('-date')
         return queryset
 
 class NoticeDetailView(generics.RetrieveAPIView):
