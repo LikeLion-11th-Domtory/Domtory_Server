@@ -18,11 +18,11 @@ class PushService:
         self._member_repository = member_repository
         self._table = get_dynamodb_table('domtory')
     
-    def make_menu_push_notification_data(self, event, timezone: str):
-        valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail()
+    def make_menu_push_notification_data(self, event, timezone: str, dorm_id: int):
+        valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail(dorm_id)
         member_ids = {valid_device.member_id for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, timezone)}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, timezone)]
-        menu_string_set, timezone = self._get_menu_data_set_and_message_title(timezone)
+        menu_string_set, timezone = self._get_menu_data_set_and_message_title(timezone, dorm_id)
         title = f"🐿️ 오늘의 돔토리 {timezone} 메뉴에요. 🍽️"
         return self._wrapping_notification_data(member_ids, title, menu_string_set, valid_device_tokens)
     
@@ -196,7 +196,7 @@ class PushService:
         formatted_now = now.strftime('%y%m%d')
         return formatted_now
     
-    def _get_menu_data_set_and_message_title(self, timezone: str):
+    def _get_menu_data_set_and_message_title(self, timezone: str, dorm_id: int):
         title_mapping: dict = {
             "breakfast": "아침",
             "lunch": "점심",
@@ -204,9 +204,10 @@ class PushService:
         }
         date_code: str = self._make_today_date_code()
         target_table_name = timezone
-        menu: list[Menu] = get_list_or_404(Menu.objects.prefetch_related(target_table_name), date_code=date_code)
-        menu_set = getattr(menu[0], target_table_name).all()
-
+        menu: list[Menu] = get_list_or_404(
+            Menu.objects.prefetch_related(target_table_name).filter(dorm_id=dorm_id, date_code=date_code)
+        )
+        menu_set = getattr(menu[0], target_table_name).filter(dorm_id=dorm_id)
         menu_string_set: str = ''
         for menu in menu_set:
             menu_string_set += f"{menu.name}, "
