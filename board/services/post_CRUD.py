@@ -1,3 +1,4 @@
+from dorm.domains import Dorm
 from ..serializers import PostRequestSerializer, PostResponseSerializer, ImageRequestSerializer, CommentResponseSerializer
 from ..models import Board, PostImage, Post, Comment
 from utils.s3 import S3Connect
@@ -25,8 +26,39 @@ def get_post_detail(request, post_id):
     response = PostResponseSerializer(post, context = {'request' : request}).data
     return response
 
+"""
+게시글 작성
+"""
+def create_post_v2(request, board_id):
+    board = Board.objects.get(pk = board_id)
+    serializer = PostRequestSerializer(data = request.data)
+    serializer.is_valid(raise_exception=True)
+    post = serializer.save(member = request.user, board = board, dorm = request.user.dorm)
+
+    if post.board_id in (4, 5):
+        send_push_notification_handler.delay('post-notification-event', post_id=post.id)
+    elif post.board_id == 6:
+        send_push_notification_handler.delay('post-notification-event', post_id=post.id)
+
+    if 'images' not in request.data:
+        response = get_post_detail(request, post.id)
+        return response
+
+    image_request_serializer = ImageRequestSerializer(data = request.data)
+    image_request_serializer.is_valid(raise_exception=True)
+    image_data = image_request_serializer.validated_data
+    image_list = image_data.get('images')
+
+    if image_list:
+        s3 = S3Connect()
+        s3.upload_resized_image(post, image_list)
+
+    response = get_post_detail(request, post.id)
+    return response
+
 
 """
+deprecated
 게시글 작성 메소드
 """
 def create_post(request, board_id):

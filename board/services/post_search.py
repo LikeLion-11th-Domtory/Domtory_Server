@@ -31,7 +31,37 @@ def build_search_query(word_list):
     return query
 
 
+def search_post_by_board_id_and_dorm_id(request, word_list, board_id):
+    ## 전체 게시판(1~7)에 대하여 검색
+    if board_id == 0:
+      query = Q(build_search_query(word_list)
+                &Q(is_blocked = False)&Q(is_deleted = False)
+                &Q(dorm = request.user.dorm_id))|Q(board_id = 7)
+    ## 전체 기숙사 게시판(7)에 대하여 검색
+    elif board_id == 7:
+        query = (Q(build_search_query(word_list))
+                 &Q(is_blocked = False)&Q(is_deleted = False)
+                 &Q(board_id = 7))
+    ## 특정 게시판에 대하여 검색(1~6)
+    else:
+        query = (Q(board = board_id)&Q(dorm = request.user.dorm_id)
+                 &Q(is_blocked = False)&Q(is_deleted = False)
+                 &build_search_query(word_list))
+
+    posts = Post.objects.filter(query).order_by('-created_at')
+
+    paginator = PostPageNumberPagination()
+    page = paginator.paginate_queryset(posts, request)
+
+    serializer = PostSimpleSerializer(page, many = True)
+
+    return paginator.get_pages(serializer.data)
+
+
+
+
 """
+deprecated
 하나의 게시판에서 검색
 """
 def search_post_in_board(word_list, board_id):
@@ -41,6 +71,7 @@ def search_post_in_board(word_list, board_id):
 
 
 """
+deprecated
 모든 게시판에서 검색
 """
 def search_post_in_all_boards(word_list):
@@ -50,6 +81,7 @@ def search_post_in_all_boards(word_list):
 
 
 """
+deprecated
 특정 게시판의 검색 결과를 페이지네이션하여 반환
 """
 def paginate_and_search_post_in_board(request, word_list, board_id):

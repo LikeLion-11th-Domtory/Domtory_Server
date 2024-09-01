@@ -1,4 +1,7 @@
 from django.contrib import admin, messages
+from django.db.models import Q
+
+from dorm.domains import Dorm
 from .models import *
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -28,6 +31,12 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = (BoardFilter,)
     search_fields = ['title', 'member__name']
 
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super().get_queryset(request)
+        queryset = super().get_queryset(request)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+
     def get_member_name(self, obj):
         return obj.member.name
     get_member_name.short_description = '작성자'
@@ -41,6 +50,12 @@ class PostImageAdmin(admin.ModelAdmin):
     list_display = ('post', 'get_member_name')
     search_fields = ['post__title']
 
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super().get_queryset(request)
+        queryset = super().get_queryset(request)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+
     def get_member_name(self, obj):
         return obj.post.member.name
     get_member_name.short_description = '작성자'
@@ -51,6 +66,12 @@ class CommentAdmin(admin.ModelAdmin):
     list_display_links = ('body', 'post', 'get_member_name')
     search_fields = ['post__title', 'member__name']
     fields = ('post', 'parent', 'body')
+
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super().get_queryset(request)
+        queryset = super().get_queryset(request)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
     
     def get_member_name(self, obj):
         return obj.member.name

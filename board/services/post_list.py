@@ -1,6 +1,6 @@
 from ..serializers import PostSimpleSerializer
 from ..models import Board, Post
-from rest_framework.permissions import *
+from ..repositories import BoardRepository as board_repository
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
 from collections import OrderedDict
@@ -20,7 +20,8 @@ class PostPageNumberPagination(PageNumberPagination):
     
 
 """
-게시반 별 리스트 반환 (페이지네이션으로 대체 예정)
+deprecated
+게시반 별 리스트 반환
 """
 def unpaginated_post_list(request, board_id):
         board = Board.objects.get(pk = board_id)
@@ -36,6 +37,7 @@ def unpaginated_post_list(request, board_id):
 
 
 """
+deprecated
 게시판별 리스트를 페이지네이션 하여 반환
 """
 def paginated_post_list(request, board_id):
@@ -50,6 +52,7 @@ def paginated_post_list(request, board_id):
 
 
 """
+deprecated
 특정 게시판의 최근 게시물 5개를 반환
 """
 def recent_posts_in_board(board_id):
@@ -68,7 +71,8 @@ def recent_posts_in_all_boards():
 
 
 """
-내가 쓴 게시글 반환 (페이지네이션으로 대체 예정)
+deprecated
+내가 쓴 게시글 반환
 """
 def my_posts(user):
     posts = user.post.filter(Q(is_deleted = False)&Q(is_blocked = False)).order_by('-created_at')
@@ -77,7 +81,8 @@ def my_posts(user):
 
 
 """
-내가 댓글을 쓴 게시글 반환 (페이지네이션으로 대체 예정)
+deprecated
+내가 댓글을 쓴 게시글 반환
 """
 def my_comments(user):
     posts = Post.objects.filter(comment__member=user, is_deleted=False, is_blocked=False).prefetch_related('comment__post').distinct().order_by('-created_at')
@@ -108,4 +113,32 @@ def paginated_my_comments(request, user):
 
     serializer = PostSimpleSerializer(page, many = True)
 
+    return paginator.get_pages(serializer.data)
+
+
+"""
+자신이 속한 기숙사의 자유게시판 최신글 5개를 조회
+"""
+def get_recent_posts_by_dorm(request, board_id):
+    user = request.user
+    posts = Post.objects.filter(
+        Q(board__pk = board_id)&Q(dorm__pk = user.dorm_id)
+        &Q(is_blocked = False)&Q(is_deleted = False)
+    ).order_by('-created_at')[:5]
+    serializer = PostSimpleSerializer(posts, many = True)
+    return serializer.data
+
+
+"""
+자신의 기숙사에 해당하는 게시판을 조회
+"""
+def get_posts_by_dorm(request, board_id):
+    user = request.user
+    posts = Post.objects.filter(
+        Q(board__pk = board_id)&Q(dorm__pk = user.dorm_id)
+        &Q(is_blocked = False)&Q(is_deleted = False)
+    ).order_by('-created_at')
+    paginator = PostPageNumberPagination()
+    page = paginator.paginate_queryset(posts, request)
+    serializer = PostSimpleSerializer(page, many = True)
     return paginator.get_pages(serializer.data)

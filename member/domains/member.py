@@ -22,6 +22,6 @@ class Member(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
     last_login = None
-    
+
     class Meta:
         db_table = 'member'

@@ -4,13 +4,25 @@ from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import *
 from ..permissions import IsStaffOrReadOnly
-from ..services import (create_post,
-                        update_post,
-                        delete_post,
-                        get_post_detail,)
+from ..services.post_CRUD import *
+
+
+class PostCreateViewV2(APIView):
+    """
+    게시글 작성 뷰(확장 이후)
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, board_id):
+        response = create_post_v2(request, board_id)
+        return Response(response, status = status.HTTP_201_CREATED)
+
+
 
 class PostCreateView(APIView):
     """
+    deprecated
     게시글 작성 뷰
     """
     authentication_classes = [JWTAuthentication]

@@ -3,14 +3,23 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import *
 from ..permissions import IsStaffOrReadOnly
+from board.services.popular_board_list import *
 
-from board.models.board_models import Board
-from board.services.popular_board_list import get_popular_board_list
+
+class PopularBoardListViewV2(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsStaffOrReadOnly]
+
+    def get(self, request):
+        response = find_popular_post_by_dorm_id(request)
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class PopularBoardListView(APIView):
+    """
+    deprecated
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsStaffOrReadOnly]
 
