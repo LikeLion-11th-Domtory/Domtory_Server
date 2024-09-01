@@ -35,18 +35,26 @@ def search_post_by_board_id_and_dorm_id(request, word_list, board_id):
     ## 전체 게시판(1~7)에 대하여 검색
     if board_id == 0:
       query = Q(build_search_query(word_list)
-                &Q(is_blocked = False)&Q(is_deleted = False)
-                &Q(dorm = request.user.dorm_id))|Q(board_id = 7)
+                &Q(is_blocked = False)
+                &Q(is_deleted = False)
+                &(~Q(board_id = 6))
+                &(
+                    Q(dorm = request.user.dorm_id)|Q(board_id = 7))
+                )
     ## 전체 기숙사 게시판(7)에 대하여 검색
     elif board_id == 7:
         query = (Q(build_search_query(word_list))
-                 &Q(is_blocked = False)&Q(is_deleted = False)
+                 &Q(is_blocked = False)
+                 &Q(is_deleted = False)
                  &Q(board_id = 7))
     ## 특정 게시판에 대하여 검색(1~6)
     else:
-        query = (Q(board = board_id)&Q(dorm = request.user.dorm_id)
-                 &Q(is_blocked = False)&Q(is_deleted = False)
-                 &build_search_query(word_list))
+        query = Q(build_search_query(word_list)
+                  &Q(is_blocked = False)
+                  &Q(is_deleted = False)
+                  &(
+                      Q(dorm = request.user.dorm_id)&Q(board_id = board_id))
+                  )
 
     posts = Post.objects.filter(query).order_by('-created_at')
 
