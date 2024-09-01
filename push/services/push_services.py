@@ -23,7 +23,7 @@ class PushService:
         member_ids = {valid_device.member_id for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, timezone)}
         valid_device_tokens = [valid_device.device_token for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, timezone)]
         menu_string_set, timezone = self._get_menu_data_set_and_message_title(timezone)
-        title = f"🐿️ 오늘의 돔토리 {timezone} 메뉴에요. 🍽️"
+        title = f"🐿️ 오늘의 돔토리 {timezone} 메뉴예요. 🍽️"
         return self._wrapping_notification_data(member_ids, title, menu_string_set, valid_device_tokens)
     
     def make_comment_push_notification_data(
