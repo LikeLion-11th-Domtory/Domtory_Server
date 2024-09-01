@@ -49,6 +49,12 @@ class MemberCustomAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         return queryset.filter(dorm = request.user.dorm)
 
+    # admin 페이지에서 멤버 새로 생성 시 비밀번호에 생일 자동 저장
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:  # 객체가 새로 생성될 때
+            obj.password = obj.birthday  # password 필드에 birthday 값 저장
+        super().save_model(request, obj, form, change)
+
 class PersonalInfoExcelFiletAdmin(admin.ModelAdmin):
     list_display = ['excel_file', 'created_at']
     list_display_links = ['created_at']
