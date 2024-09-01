@@ -62,7 +62,7 @@ class PushService:
         post: Post = self._board_repository.find_post_by_id(post_id)
         notification_setting = notification_setting_map.get(post.board_id)
         if notification_setting:
-            valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail()
+            valid_devices = self._push_repository.find_all_devices_with_member_and_notification_detail(dorm_id=post.dorm_id)
             member_ids = {
                 valid_device.member_id for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, notification_setting)
             }
@@ -70,7 +70,7 @@ class PushService:
                 valid_device.device_token for valid_device in valid_devices if getattr(valid_device.member.notificationdetail, notification_setting)
             ]
         else:
-            valid_devices = self._push_repository.find_all_devices()
+            valid_devices = self._push_repository.find_all_devices_by_dorm_id(dorm_id=post.dorm_id)
             valid_device_tokens = [valid_device.device_token for valid_device in valid_devices]
             member_ids = {valid_device.member_id for valid_device in valid_devices}
 
