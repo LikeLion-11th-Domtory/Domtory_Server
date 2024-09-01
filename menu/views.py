@@ -26,15 +26,15 @@ class MenuListView(APIView):
             sunday = find_sunday(date_code)
             saturday = (datetime.datetime.strptime(sunday, '%y%m%d').date() + datetime.timedelta(days=6)).strftime('%y%m%d')
             menus = Menu.objects.filter(date_code__gte=sunday, date_code__lte=saturday, dorm = request.user.dorm)
-            serializer = MenuListSerializer(menus, many=True)
+            serializer = MenuListSerializer(menus, many=True, context = {'request' : request})
         else:
             menus = Menu.objects.filter(date_code=date_code, dorm = request.user.dorm)
             if option == 'breakfast':
-                serializer = BreakfastListSerializer(menus, many=True)
+                serializer = BreakfastListSerializer(menus, many=True, context = {'request' : request})
             elif option == 'lunch':
-                serializer = LunchListSerializer(menus, many=True)
+                serializer = LunchListSerializer(menus, many=True, context = {'request' : request})
             elif option == 'dinner':
-                serializer = DinnerListSerializer(menus, many=True)
+                serializer = DinnerListSerializer(menus, many=True, context = {'request' : request})
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)

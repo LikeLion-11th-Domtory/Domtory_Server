@@ -21,7 +21,8 @@ class BreakfastListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfast.all()]
+        request = self.context.get('request')
+        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfast.filter(dorm = request.user.dorm)]
         return ret
 
 
@@ -40,7 +41,8 @@ class LunchListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunch.all()]
+        request = self.context.get('request')
+        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunch.filter(dorm = request.user.dorm)]
         return ret
 
 
@@ -59,7 +61,8 @@ class DinnerListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinner.all()]
+        request = self.context.get('request')
+        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinner.filter(dorm = request.user.dorm)]
         return ret
 
 
@@ -80,7 +83,8 @@ class MenuListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfast.all()]
-        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunch.all()]
-        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinner.all()]
+        request = self.context.get('request')
+        ret['breakfast_list'] = [breakfast_list.name for breakfast_list in instance.breakfast.filter(dorm = request.user.dorm)]
+        ret['lunch_list'] = [lunch_list.name for lunch_list in instance.lunch.filter(dorm = request.user.dorm)]
+        ret['dinner_list'] = [dinner_list.name for dinner_list in instance.dinner.filter(dorm = request.user.dorm)]
         return ret
