@@ -15,7 +15,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     birthday = models.CharField(max_length=255)
-    dorm = models.ForeignKey('dorm.Dorm', on_delete=models.CASCADE, verbose_name="소속 기숙사", null=False, default=2) # 기본값: 동서울관
+    dorm = models.ForeignKey('dorm.Dorm', verbose_name="소속 기숙사")
     status = models.CharField(max_length=255, choices=MEMBER_STATUS_CHOICES, default='ACTIVE')
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
