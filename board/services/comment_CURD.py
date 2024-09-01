@@ -33,10 +33,10 @@ def create_comment(request, post_id):
     
     serializer = CommentRequestSerializer(data = request.data)
     if serializer.is_valid():
-        comment = serializer.save(post = post, member = request.user, anonymous_number = anonymous_number)
+        comment = serializer.save(post = post, member = request.user, anonymous_number = anonymous_number, dorm = request.user.dorm)
         post.comment_cnt += 1
         post.save()
-        send_push_notification_handler.delay('comment-notification-event', None, comment.id)
+        # send_push_notification_handler.delay('comment-notification-event', None, comment.id)
         response = get_post_detail(request, post.id)
         return response
     return serializer.errors
@@ -86,10 +86,10 @@ def create_reply(request, comment_id):
 
     serializer = ReplyRequestSerializer(data = request.data)
     if serializer.is_valid():
-        reply = serializer.save(parent = parent, post = post, member = request.user, anonymous_number = anonymous_number)
+        reply = serializer.save(parent = parent, post = post, member = request.user, anonymous_number = anonymous_number, dorm = request.user.dorm)
         post.comment_cnt += 1
         post.save()
-        send_push_notification_handler.delay('comment-notification-event', None, reply.id)
+        # send_push_notification_handler.delay('comment-notification-event', None, reply.id)
         response = get_post_detail(request, post.pk)
         return response
     return serializer.errors

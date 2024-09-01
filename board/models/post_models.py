@@ -8,7 +8,7 @@ class Post(models.Model):
     """
     member = models.ForeignKey(Member, null = False, on_delete = models.CASCADE, verbose_name = '작성자', related_name = 'post')
     board = models.ForeignKey(Board, null = False, on_delete = models.CASCADE, verbose_name = '게시판', related_name = 'post')
-    dorm = models.ForeignKey('dorm.Dorm', null = False, on_delete = models.CASCADE, verbose_name = '기숙사', default=2, related_name = 'post')
+    dorm = models.ForeignKey('dorm.Dorm', null = True, on_delete = models.SET_NULL, verbose_name = '기숙사', related_name = 'post')
     title = models.CharField(max_length = 90, verbose_name = '제목', null = False) # 한글 30글자
     body = models.TextField(default = "", verbose_name = '내용')
     created_at = models.DateTimeField(auto_now_add = True, verbose_name = '작성일시')
@@ -36,7 +36,7 @@ class PostImage(models.Model):
     게시글 이미지 모델
     """
     post = models.ForeignKey(Post, null = False, on_delete = models.CASCADE, verbose_name = '게시글', related_name = 'post_image')
-    dorm = models.ForeignKey('dorm.Dorm', null = False, on_delete = models.CASCADE, verbose_name = '기숙사', default=2, related_name = 'post_image')
+    dorm = models.ForeignKey('dorm.Dorm', null = True, on_delete = models.SET_NULL, verbose_name = '기숙사', related_name = 'post_image')
     image_url = models.CharField(null = False, max_length = 255)
     is_deleted = models.BooleanField(default = False)
     is_thumbnail = models.BooleanField(default = False)
