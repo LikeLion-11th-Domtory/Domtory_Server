@@ -1,6 +1,10 @@
+from typing import Any
 from django.contrib import admin, messages
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 from report.models.report_models import Report
 from member.domains.member import Member
+from dorm.domains import Dorm
 from board.models.post_models import Post
 from board.models.comment_models import Comment
 
@@ -23,6 +27,11 @@ class ReportAdmin(admin.ModelAdmin):
     fields = ('status', 'reported_at', 'target_body', 'member_name', 'member_status')
     readonly_fields = ('reported_at', 'target_body', 'member_name')
 
+    def get_queryset(self, request):
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
+            return super().get_queryset(request)
+        queryset = super().get_queryset(request)
+        return queryset.filter(dorm = request.user.dorm)
 
     # 신고 객체에서 신고 내용 확인
     def target_body(self, obj):
@@ -43,8 +52,7 @@ class ReportAdmin(admin.ModelAdmin):
             link = reverse('admin:board_comment_change', args=[obj.comment.id])
             return format_html('<a href="{}">{}</a>', link, f"댓글 신고 : {obj.comment.body}")
         elif obj.message:
-            link = reverse('admin:message_message_change', args=[obj.message.id])
-            return format_html('<a href="{}">{}</a>', link, f"쪽지 신고 : {obj.message.body}")
+            return f"쪽지 신고 :  {obj.message.body}"
 
     target.short_description = '신고글'
 

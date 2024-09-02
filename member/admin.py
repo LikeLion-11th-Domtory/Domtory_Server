@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Member, PersonalInfoExcelFile
+from dorm.domains import Dorm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.admin.widgets import FilteredSelectMultiple    
@@ -44,7 +45,7 @@ class MemberCustomAdmin(admin.ModelAdmin):
     list_filter = ['status']
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
         return queryset.filter(dorm = request.user.dorm)
