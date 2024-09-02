@@ -1,5 +1,6 @@
 from django.db import models
 from board.models import Comment, Post
+from dorm.domains import Dorm
 from message.domains.message_models import Message
 from member.models import Member
 
@@ -21,6 +22,7 @@ class Report(models.Model):
     )
     status = models.CharField(choices=REPORT_TYPE_CHOICES, default="WAITING", max_length=10)
     reported_at = models.DateTimeField(auto_now_add=True)
+    dorm = models.ForeignKey(Dorm, null=True, on_delete=models.SET_NULL, verbose_name = '기숙사')
     post = models.ForeignKey(Post, null=True, blank=True, on_delete=models.SET_NULL)
     comment = models.ForeignKey(Comment, null=True, blank=True, on_delete=models.SET_NULL)
     message = models.ForeignKey(Message, null=True, blank=True, on_delete=models.SET_NULL)

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Member, PersonalInfoExcelFile
+from dorm.domains import Dorm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.admin.widgets import FilteredSelectMultiple    
@@ -47,7 +48,7 @@ class MemberCustomAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm = request.user.dorm)
+        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
 
     # admin 페이지에서 멤버 새로 생성 시 비밀번호에 생일 자동 저장
     def save_model(self, request, obj, form, change):
