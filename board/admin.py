@@ -32,10 +32,10 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ['title', 'member__name']
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+        return queryset.filter(Q(dorm_id = request.user.dorm.id)|Q(board_id = 7))
 
     def get_member_name(self, obj):
         return obj.member.name
@@ -51,10 +51,10 @@ class PostImageAdmin(admin.ModelAdmin):
     search_fields = ['post__title']
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
-        queryset = super().get_queryset(request)
-        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+        queryset = PostImage.objects.select_related('post').filter(Q(dorm_id = request.user.dorm.id)|Q(post__board_id = 7))
+        return queryset
 
     def get_member_name(self, obj):
         return obj.post.member.name
@@ -68,10 +68,10 @@ class CommentAdmin(admin.ModelAdmin):
     fields = ('post', 'parent', 'body')
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
-        queryset = super().get_queryset(request)
-        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+        queryset = Comment.objects.select_related('post').filter(Q(dorm_id = request.user.dorm.id)|Q(post__board_id = 7))
+        return queryset
     
     def get_member_name(self, obj):
         return obj.member.name
