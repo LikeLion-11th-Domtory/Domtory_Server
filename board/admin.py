@@ -32,8 +32,8 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ['title', 'member__name']
 
     def get_queryset(self, request):
-        # if request.user.is_superuser:
-        #     return super().get_queryset(request)
+        if request.user.is_superuser:
+            return super().get_queryset(request)
         queryset = super().get_queryset(request)
         return queryset.filter(Q(dorm_id = request.user.dorm.id)|Q(board_id = 7))
 
@@ -51,8 +51,8 @@ class PostImageAdmin(admin.ModelAdmin):
     search_fields = ['post__title']
 
     def get_queryset(self, request):
-        # if request.user.is_superuser:
-        #     return super().get_queryset(request)
+        if request.user.is_superuser:
+            return super().get_queryset(request)
         queryset = PostImage.objects.select_related('post').filter(Q(dorm_id = request.user.dorm.id)|Q(post__board_id = 7))
         return queryset
 
@@ -68,8 +68,8 @@ class CommentAdmin(admin.ModelAdmin):
     fields = ('post', 'parent', 'body')
 
     def get_queryset(self, request):
-        # if request.user.is_superuser:
-        #     return super().get_queryset(request)
+        if request.user.is_superuser:
+            return super().get_queryset(request)
         queryset = Comment.objects.select_related('post').filter(Q(dorm_id = request.user.dorm.id)|Q(post__board_id = 7))
         return queryset
     
