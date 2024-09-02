@@ -7,19 +7,16 @@ from report.serializers.report_serializer import *
 def create_report(request, target_type, target_id):
     if target_type == "post":
         target = Post.objects.get(pk=target_id)
-        dorm = Dorm.objects.get(pk=target.dorm_id)
-        serializer = ReportPostSerializer(data={'post': target.id, 'dorm': dorm.id})
+        serializer = ReportPostSerializer(data={'post': target.id, 'dorm': target.dorm.id})
 
     elif target_type == "comment":
         target = Comment.objects.get(pk=target_id)
-        dorm = Dorm.objects.get(pk=target.dorm_id)
-        serializer = ReportCommentSerializer(data={'comment': target.id, 'dorm': dorm.id})
+        serializer = ReportCommentSerializer(data={'comment': target.id, 'dorm': target.dorm.id})
 
     elif target_type == "message":
         target = Message.objects.get(pk=target_id)
         post_of_target = target.message_room.post
-        dorm = Dorm.objects.get(pk=post_of_target.dorm_id)
-        serializer = ReportMessageSerializer(data={'message': target.id, 'dorm': dorm.id})
+        serializer = ReportMessageSerializer(data={'message': target.id, 'dorm': post_of_target.dorm.id})
     
      # post, comment, message 외래키 연결해서 역직렬화
     
