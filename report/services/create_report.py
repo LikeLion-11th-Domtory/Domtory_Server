@@ -15,8 +15,7 @@ def create_report(request, target_type, target_id):
 
     elif target_type == "message":
         target = Message.objects.get(pk=target_id)
-        post_of_target = target.message_room.post
-        serializer = ReportMessageSerializer(data={'message': target.id, 'dorm': post_of_target.dorm.id})
+        serializer = ReportMessageSerializer(data={'message': target.id, 'dorm': target.sender.dorm.id})
     
      # post, comment, message 외래키 연결해서 역직렬화
     
