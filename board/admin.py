@@ -68,7 +68,7 @@ class CommentAdmin(admin.ModelAdmin):
     fields = ('post', 'parent', 'body')
 
     def get_queryset(self, request):
-        if request.user.is_superuseror or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
         queryset = Comment.objects.select_related('post').filter(Q(dorm_id = request.user.dorm.id)|Q(post__board_id = 7))
         return queryset
