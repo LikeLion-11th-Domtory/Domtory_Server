@@ -43,8 +43,7 @@ class ReportAdmin(admin.ModelAdmin):
             link = reverse('admin:board_comment_change', args=[obj.comment.id])
             return format_html('<a href="{}">{}</a>', link, f"댓글 신고 : {obj.comment.body}")
         elif obj.message:
-            link = reverse('admin:message_message_change', args=[obj.message.id])
-            return format_html('<a href="{}">{}</a>', link, f"쪽지 신고 : {obj.message.body}")
+            return f"쪽지 신고 :  {obj.message.body}"
 
     target.short_description = '신고글'
 
