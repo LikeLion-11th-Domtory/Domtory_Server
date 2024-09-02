@@ -45,10 +45,10 @@ class MemberCustomAdmin(admin.ModelAdmin):
     list_filter = ['status']
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+        return queryset.filter(dorm = request.user.dorm)
 
     # admin 페이지에서 멤버 새로 생성 시 비밀번호에 생일 자동 저장
     def save_model(self, request, obj, form, change):

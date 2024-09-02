@@ -28,10 +28,10 @@ class ReportAdmin(admin.ModelAdmin):
     readonly_fields = ('reported_at', 'target_body', 'member_name')
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
-        return queryset.filter(dorm__in = [request.user.dorm, Dorm.DORM_LIST[0][1]])
+        return queryset.filter(dorm = request.user.dorm)
 
     # 신고 객체에서 신고 내용 확인
     def target_body(self, obj):
