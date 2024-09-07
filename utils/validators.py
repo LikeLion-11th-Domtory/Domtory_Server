@@ -2,6 +2,8 @@ import re
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from member.domains import Member
+from dorm.domains import Dorm
+from django.db.models import Q
 
 ERROR_MESSAGE = {
             'blank': '값을 채워주세요!',
@@ -28,3 +30,20 @@ def validate_email(email):
 def validate_nickname(nickname):
     if Member.objects.filter(nickname=nickname).exists():
         raise ValidationError("닉네임이 이미 존재해요! 다른 걸로 부탁해요.")
+    
+def validate_birthday(birthday):
+    birthday_reg = r"^\d{8}$"
+    birthday_regex = re.compile(birthday_reg)
+
+    if not birthday_regex.match(birthday):
+        raise ValidationError("생년월일은 YYYYMMDD 형식의 8자리 숫자로 입력해주세요.")
+    
+def validate_dormitory_code(dormitory_code):
+    if Member.objects.filter(Q(username=dormitory_code) & Q(dorm=Dorm.DORM_LIST[0][1])).exists():
+        raise ValidationError("이미 가입된 회원이에요!")
+    
+    dormitory_code_reg = r"^\d{2}-\d{4}$"
+    dormitory_code_regex = re.compile(dormitory_code_reg)
+
+    if not dormitory_code_regex.match(dormitory_code):
+        raise ValidationError("학사번호는 NN-NNNN 형식으로 입력해주세요. ex)12-3456")

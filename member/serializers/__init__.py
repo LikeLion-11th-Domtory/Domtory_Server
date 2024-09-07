@@ -1,6 +1,6 @@
 from .member_serializer import (
                             SignupRequestSerializer,
-                            SignupRequestWithoutDormitoryCardSerializer,
+                            SignupRequestSerializerV2,
                             SigninRequestSerialzier,
                             SigninResponseSerializer,
                             PasswordChangeRequestSerializer,

@@ -1,13 +1,14 @@
 from member.domains import MemberRepository
 from member.serializers import (
                             SignupRequestSerializer,
-                            SignupRequestWithoutDormitoryCardSerializer,
+                            SignupRequestSerializerV2,
                             SigninRequestSerialzier,
                             SigninResponseSerializer,
                             PasswordChangeRequestSerializer,
                             MemberInfoSerializer,
                         )
 from member.domains import Member
+from dorm.domains import Dorm
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from utils.exceptions import (
@@ -26,10 +27,10 @@ class MemberService:
         self._member_repository = member_repository
 
     def signup_for_west_dormitory(self, request_data:dict):
-        signup_request_serializer = SignupRequestWithoutDormitoryCardSerializer(data=request_data)
+        signup_request_serializer = SignupRequestSerializerV2(data=request_data)
         signup_request_serializer.is_valid(raise_exception=True)
         signup_data = signup_request_serializer.validated_data
-        member = self._make_member_without_dormitory_card(signup_data)
+        member = self._make_member_v2(signup_data)
         self._member_repository.save_member(member)
 
     """
@@ -82,9 +83,6 @@ class MemberService:
         member_info_serializer = MemberInfoSerializer(member)
         return member_info_serializer.data
 
-    """
-    deprecated
-    """
     def _save_dormitory_card_image(self, signup_data):
         s3_conn = S3Connect()
         dormitory_card = signup_data.get('dormitory_card')
@@ -93,13 +91,15 @@ class MemberService:
         url = s3_conn.upload_to_s3(dormitory_card, key)
         return url
 
-    def _make_member_without_dormitory_card(self, signup_data):
+    def _make_member_v2(self, signup_data):
         member = Member(
-            password=self._make_hashed_password(signup_data.get('password')),
-            dormitory_code=signup_data.get('dormitory_code'),
+            password=signup_data.get('birthday'),
+            username=signup_data.get('dormitory_code'),
             phone_number=signup_data.get('phone_number'),
             name=signup_data.get('name'),
-            birthday=signup_data.get('birthday')
+            birthday=signup_data.get('birthday'),
+            dorm=Dorm.objects.get(dorm_name=Dorm.DORM_LIST[2][0]), #서서울관
+            status=Member.MEMBER_STATUS_CHOICES[0][0] #PENDING
         )
         return member
     
