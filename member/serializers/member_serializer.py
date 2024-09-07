@@ -2,6 +2,9 @@ from rest_framework import serializers
 from member.domains import Member
 from utils.validators import validate_password, validate_email, validate_nickname, ERROR_MESSAGE
 
+"""
+deprecated
+"""
 class SignupRequestSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[validate_email], error_messages=ERROR_MESSAGE)
     password = serializers.CharField(validators=[validate_password], error_messages=ERROR_MESSAGE)
@@ -15,6 +18,17 @@ class SignupRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = ('email', 'password', 'name', 'phoneNumber', 'nickname', 'birthday', 'dormitoryCode', 'dormitoryCard')
+
+class SignupRequestWithoutDormitoryCardSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(validators=[validate_password], error_messages=ERROR_MESSAGE)
+    phoneNumber = serializers.CharField(source='phone_number', error_messages=ERROR_MESSAGE)
+    dormitoryCode = serializers.CharField(source='dormitory_code', error_messages=ERROR_MESSAGE)
+    name = serializers.CharField(error_messages=ERROR_MESSAGE)
+    birthday = serializers.CharField(error_messages=ERROR_MESSAGE)
+
+    class Meta:
+        model = Member
+        fields = ('password', 'name', 'phoneNumber', 'birthday', 'dormitoryCode')
     
 class SigninRequestSerialzier(serializers.ModelSerializer):
     username = serializers.CharField(validators=[])

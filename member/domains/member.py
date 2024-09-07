@@ -6,6 +6,7 @@ from dorm.domains import Dorm
 class Member(AbstractBaseUser, PermissionsMixin):
     objects = MemberManager()
     MEMBER_STATUS_CHOICES = (
+        ('PENDING','가입 승인 대기'),
         ('ACTIVE','활동'),
         ('BANNED', '정지'),
         ('WITHDRAWAL', '탈퇴')

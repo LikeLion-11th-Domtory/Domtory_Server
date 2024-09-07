@@ -1,6 +1,7 @@
 from member.domains import MemberRepository
 from member.serializers import (
                             SignupRequestSerializer,
+                            SignupRequestWithoutDormitoryCardSerializer,
                             SigninRequestSerialzier,
                             SigninResponseSerializer,
                             PasswordChangeRequestSerializer,
@@ -24,6 +25,16 @@ class MemberService:
     def __init__(self, member_repository: MemberRepository):
         self._member_repository = member_repository
 
+    def signup_for_west_dormitory(self, request_data:dict):
+        signup_request_serializer = SignupRequestWithoutDormitoryCardSerializer(data=request_data)
+        signup_request_serializer.is_valid(raise_exception=True)
+        signup_data = signup_request_serializer.validated_data
+        member = self._make_member_without_dormitory_card(signup_data)
+        self._member_repository.save_member(member)
+
+    """
+    deprecated
+    """
     def signup(self, request_data: dict):
         signup_request_serializer = SignupRequestSerializer(data=request_data)
         signup_request_serializer.is_valid(raise_exception=True)
@@ -71,6 +82,9 @@ class MemberService:
         member_info_serializer = MemberInfoSerializer(member)
         return member_info_serializer.data
 
+    """
+    deprecated
+    """
     def _save_dormitory_card_image(self, signup_data):
         s3_conn = S3Connect()
         dormitory_card = signup_data.get('dormitory_card')
@@ -79,6 +93,19 @@ class MemberService:
         url = s3_conn.upload_to_s3(dormitory_card, key)
         return url
 
+    def _make_member_without_dormitory_card(self, signup_data):
+        member = Member(
+            password=self._make_hashed_password(signup_data.get('password')),
+            dormitory_code=signup_data.get('dormitory_code'),
+            phone_number=signup_data.get('phone_number'),
+            name=signup_data.get('name'),
+            birthday=signup_data.get('birthday')
+        )
+        return member
+    
+    """
+    deprecated
+    """
     def _make_member(self, signup_data, url: str):
         member = Member(
             email=signup_data.get('email'),

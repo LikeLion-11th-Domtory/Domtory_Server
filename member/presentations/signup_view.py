@@ -13,7 +13,7 @@ response_example = openapi.Response(
         "email": ["이미 가입된 회원이에요!"],
         "password": ["영문, 숫자, 특수문자를 조합해 6자 이상, 13자 이하 입력해주세요."],
         "name": ["값을 채워주세요!"],
-        "nickname": ["닉네임이 이미 존재해요! 다른 걸로 부탁해요."]
+        "birthday" : ["생년월일 8자리로 입력해주세요."]
         }
     }
 )
@@ -28,5 +28,5 @@ class SignUpView(APIView):
         """
         회원 가입 API 입니다. form-data로 전송하고 'dormitoryCard'를 포함시켜서 보내주세요.       
         """
-        self._members_service.signup(request.data)
+        self._members_service.signup_for_west_dormitory(request.data)
         return Response(status=status.HTTP_201_CREATED)
