@@ -16,7 +16,8 @@ from utils.exceptions import (
         WithdrawedMemberError,
         BannedMemberError,
         SamePasswordError,
-        AdminUnAcceptedMemberError
+        AdminUnAcceptedMemberError,
+        AdminRefusedMemberError
     )
 from utils.s3 import S3Connect
 from django.db import transaction
@@ -126,6 +127,9 @@ class MemberService:
     def _check_login(self, password: str, member: Member):
         if member.status == 'PENDING':
             raise AdminUnAcceptedMemberError
+        
+        if member.status == 'REFUSED':
+            raise AdminRefusedMemberError
         
         if member.status == 'WITHDRAWAL':
             raise WithdrawedMemberError

@@ -9,7 +9,8 @@ class Member(AbstractBaseUser, PermissionsMixin):
         ('PENDING','가입 승인 대기'),
         ('ACTIVE','활동'),
         ('BANNED', '정지'),
-        ('WITHDRAWAL', '탈퇴')
+        ('WITHDRAWAL', '탈퇴'),
+        ('REFUSED','가입 승인 거부')
     )
     id = models.BigAutoField(primary_key=True)
     username = models.CharField(unique=True, max_length=255)
