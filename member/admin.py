@@ -49,6 +49,15 @@ class MemberCustomAdmin(admin.ModelAdmin):
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
         return queryset.filter(dorm = request.user.dorm)
+    
+    # 기본적으로 'PENDING' 상태인 멤버만 보여주기
+    def changelist_view(self, request, extra_context=None):
+        if not request.GET.get('status__exact'):  # URL에 필터가 없을 경우
+            q = request.GET.copy()
+            q['status__exact'] = 'PENDING'  # 'PENDING'으로 필터링
+            request.GET = q
+            request.META['QUERY_STRING'] = request.GET.urlencode()
+        return super().changelist_view(request, extra_context=extra_context)
 
     # admin 페이지에서 멤버 새로 생성 시 비밀번호에 생일 자동 저장
     def save_model(self, request, obj, form, change):
