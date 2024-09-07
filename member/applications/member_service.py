@@ -8,7 +8,7 @@ from member.serializers import (
                             MemberInfoSerializer,
                         )
 from member.domains import Member
-from dorm.domains import Dorm
+from dorm.domains import Dorm, DormList
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from utils.exceptions import (
@@ -99,7 +99,7 @@ class MemberService:
             phone_number=signup_data.get('phone_number'),
             name=signup_data.get('name'),
             birthday=signup_data.get('birthday'),
-            dorm=Dorm.objects.get(dorm_name=Dorm.DORM_LIST[2][0]), #서서울관
+            dorm=Dorm.objects.get(pk=DormList.WEST.id), #서서울관
             status=Member.MEMBER_STATUS_CHOICES[0][0] #PENDING
         )
         return member

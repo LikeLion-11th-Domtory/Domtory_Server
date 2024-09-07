@@ -2,7 +2,7 @@ import re
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from member.domains import Member
-from dorm.domains import Dorm
+from dorm.domains import Dorm, DormList
 from django.db.models import Q
 
 ERROR_MESSAGE = {
@@ -32,5 +32,5 @@ def validate_nickname(nickname):
         raise ValidationError("닉네임이 이미 존재해요! 다른 걸로 부탁해요.")
     
 def validate_dormitory_code(dormitory_code):
-    if Member.objects.filter(Q(username=dormitory_code) & Q(dorm=Dorm.DORM_LIST[0][1])).exists():
+    if Member.objects.filter(Q(username=dormitory_code) & Q(dorm=DormList.WEST.id)).exists():
         raise ValidationError("이미 가입된 회원이에요!")

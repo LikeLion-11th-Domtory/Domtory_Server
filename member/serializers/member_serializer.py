@@ -20,8 +20,8 @@ class SignupRequestSerializer(serializers.ModelSerializer):
         fields = ('email', 'password', 'name', 'phoneNumber', 'nickname', 'birthday', 'dormitoryCode', 'dormitoryCard')
 
 class SignupRequestSerializerV2(serializers.ModelSerializer):
-    phone_number = serializers.CharField(source='phone_number', error_messages=ERROR_MESSAGE)
-    dormitory_code = serializers.CharField(validators=[validate_dormitory_code], source='dormitory_code', error_messages=ERROR_MESSAGE)
+    phone_number = serializers.CharField(error_messages=ERROR_MESSAGE)
+    dormitory_code = serializers.CharField(validators=[validate_dormitory_code], error_messages=ERROR_MESSAGE)
     name = serializers.CharField(error_messages=ERROR_MESSAGE)
     birthday = serializers.CharField(error_messages=ERROR_MESSAGE)
 
