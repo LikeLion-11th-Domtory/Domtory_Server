@@ -11,8 +11,7 @@ response_example = openapi.Response(
     examples={
         "application/json": {
         "name": ["값을 채워주세요!"],
-        "birthday" : ["생년월일 8자리로 입력해주세요."],
-        "dormitoryCode" : ["이미 가입된 회원이에요!", "dddd-dd 형식으로 입력해주세요."]
+        "dormitoryCode" : ["이미 가입된 회원이에요!"]
         }
     }
 )
