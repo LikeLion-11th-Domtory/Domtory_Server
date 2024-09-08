@@ -1,12 +1,14 @@
 from member.domains import MemberRepository
 from member.serializers import (
                             SignupRequestSerializer,
+                            SignupRequestSerializerV2,
                             SigninRequestSerialzier,
                             SigninResponseSerializer,
                             PasswordChangeRequestSerializer,
                             MemberInfoSerializer,
                         )
 from member.domains import Member
+from dorm.domains import Dorm, DormList
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from utils.exceptions import (
@@ -14,6 +16,8 @@ from utils.exceptions import (
         WithdrawedMemberError,
         BannedMemberError,
         SamePasswordError,
+        AdminUnAcceptedMemberError,
+        AdminRefusedMemberError
     )
 from utils.s3 import S3Connect
 from django.db import transaction
@@ -24,6 +28,16 @@ class MemberService:
     def __init__(self, member_repository: MemberRepository):
         self._member_repository = member_repository
 
+    def signup_for_west_dormitory(self, request_data:dict):
+        signup_request_serializer = SignupRequestSerializerV2(data=request_data)
+        signup_request_serializer.is_valid(raise_exception=True)
+        signup_data = signup_request_serializer.validated_data
+        member = self._make_member_v2(signup_data)
+        self._member_repository.save_member(member)
+
+    """
+    deprecated
+    """
     def signup(self, request_data: dict):
         signup_request_serializer = SignupRequestSerializer(data=request_data)
         signup_request_serializer.is_valid(raise_exception=True)
@@ -79,6 +93,21 @@ class MemberService:
         url = s3_conn.upload_to_s3(dormitory_card, key)
         return url
 
+    def _make_member_v2(self, signup_data):
+        member = Member(
+            password=signup_data.get('birthday'),
+            username=signup_data.get('dormitory_code'),
+            phone_number=signup_data.get('phone_number'),
+            name=signup_data.get('name'),
+            birthday=signup_data.get('birthday'),
+            dorm=Dorm.objects.get(pk=DormList.WEST.id), #서서울관
+            status=Member.MEMBER_STATUS_CHOICES[0][0] #PENDING
+        )
+        return member
+    
+    """
+    deprecated
+    """
     def _make_member(self, signup_data, url: str):
         member = Member(
             email=signup_data.get('email'),
@@ -96,6 +125,12 @@ class MemberService:
         return make_password(password=password)
     
     def _check_login(self, password: str, member: Member):
+        if member.status == 'PENDING':
+            raise AdminUnAcceptedMemberError
+        
+        if member.status == 'REFUSED':
+            raise AdminRefusedMemberError
+        
         if member.status == 'WITHDRAWAL':
             raise WithdrawedMemberError
         

@@ -1,4 +1,8 @@
+from typing import Any
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models.base import Model
+from django.db.models.query import QuerySet
 from .models import Member, PersonalInfoExcelFile
 from dorm.domains import Dorm
 from django import forms
@@ -43,12 +47,20 @@ class MemberCustomAdmin(admin.ModelAdmin):
     readonly_fields = ('id', 'password', 'is_staff', 'is_superuser')
     search_fields = ("name", "username")
     list_filter = ['status']
+    actions = ["action_change_status"]
 
     def get_queryset(self, request):
         if request.user.is_superuser or request.user.dorm_id == Dorm.DORM_LIST[0][1]:
             return super().get_queryset(request)
         queryset = super().get_queryset(request)
         return queryset.filter(dorm = request.user.dorm)
+    
+    # 여러 멤버의 가입 동시에 승인
+    def action_change_status(self, request, queryset):
+        for member in queryset:
+            member.status = Member.MEMBER_STATUS_CHOICES[1][0]
+            self.save_model(request, member, None, True)
+    action_change_status.short_description = "선택한 멤버의 가입을 승인합니다."
 
     # admin 페이지에서 멤버 새로 생성 시 비밀번호에 생일 자동 저장
     def save_model(self, request, obj, form, change):

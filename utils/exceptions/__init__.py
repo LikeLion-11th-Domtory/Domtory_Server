@@ -4,6 +4,7 @@ from .member_exception import (
                                 WithdrawedMemberError,
                                 BannedMemberError,
                                 AdminUnAcceptedMemberError,
+                                AdminRefusedMemberError,
                                 SamePasswordError,
                                )
 from .FCM_exception import FCMSendException
