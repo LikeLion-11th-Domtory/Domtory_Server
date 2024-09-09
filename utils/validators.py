@@ -33,4 +33,4 @@ def validate_nickname(nickname):
     
 def validate_dormitory_code(dormitory_code):
     if Member.objects.filter(Q(username=dormitory_code) & Q(dorm=DormList.WEST.id)).exists():
-        raise ValidationError("이미 가입된 회원이에요!")
+        raise ValidationError("이미 가입 신청한 회원이에요!")
