@@ -94,13 +94,16 @@ class MemberService:
         return url
 
     def _make_member_v2(self, signup_data):
+        dormitory_code = signup_data.get('dormitory_code')
+        dorm=Dorm.objects.get(pk=DormList.WEST.id)
         member = Member(
             password=signup_data.get('birthday'),
-            username=signup_data.get('dormitory_code'),
+            username=f"{dorm.pk}-{dormitory_code}",
+            dormitory_code=dormitory_code,
             phone_number=signup_data.get('phone_number'),
             name=signup_data.get('name'),
             birthday=signup_data.get('birthday'),
-            dorm=Dorm.objects.get(pk=DormList.WEST.id), #서서울관
+            dorm=dorm, #서서울관
             status=Member.MEMBER_STATUS_CHOICES[0][0] #PENDING
         )
         return member
