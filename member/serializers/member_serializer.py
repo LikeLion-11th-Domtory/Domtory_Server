@@ -1,6 +1,8 @@
 from rest_framework import serializers
+
+from dorm.domains import DormList
 from member.domains import Member
-from utils.validators import validate_password, validate_email, validate_nickname, validate_dormitory_code, ERROR_MESSAGE
+from utils.validators import validate_password, validate_email, validate_nickname, validate_duplicated_signup, ERROR_MESSAGE
 
 """
 deprecated
@@ -21,22 +23,27 @@ class SignupRequestSerializer(serializers.ModelSerializer):
 
 class SignupRequestSerializerV2(serializers.ModelSerializer):
     phone_number = serializers.CharField(error_messages=ERROR_MESSAGE)
-    dormitory_code = serializers.CharField(validators=[validate_dormitory_code], error_messages=ERROR_MESSAGE)
+    dorm = serializers.ChoiceField(choices=DormList.get_names(), error_messages=ERROR_MESSAGE)
+    dormitory_code = serializers.CharField(validators=[], error_messages=ERROR_MESSAGE)
     name = serializers.CharField(error_messages=ERROR_MESSAGE)
     birthday = serializers.CharField(error_messages=ERROR_MESSAGE)
 
     class Meta:
         model = Member
-        fields = ('name', 'phone_number', 'birthday', 'dormitory_code')
+        fields = ('name', 'phone_number', 'dorm', 'birthday', 'dormitory_code')
+
+    def validate(self, data):
+        validate_duplicated_signup(data['dormitory_code'], data['dorm'])
+        return data
     
 class SigninRequestSerialzier(serializers.ModelSerializer):
-    dormitory_code = serializers.CharField(validators=[validate_dormitory_code], error_messages=ERROR_MESSAGE)
-    # username = serializers.CharField(validators=[])
+    dormitory_code = serializers.CharField(validators=[], error_messages=ERROR_MESSAGE)
+    dorm = serializers.ChoiceField(choices=DormList.get_names(), error_messages=ERROR_MESSAGE)
+    password = serializers.CharField(error_messages=ERROR_MESSAGE)
 
     class Meta:
         model = Member
         fields = ('dormitory_code', 'dorm', 'password')
-        # fields = ('username', 'password')
 
 class MemberInfoSerializer(serializers.ModelSerializer):
     class Meta:

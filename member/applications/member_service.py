@@ -52,7 +52,7 @@ class MemberService:
         signin_data: dict = signin_request_serializer.validated_data
 
         dormitory_code = signin_data.get('dormitory_code')
-        dorm_id = signin_data.get('dorm').pk
+        dorm_id=DormList[(signin_data.get('dorm'))].id
         username = f"{dorm_id}-{dormitory_code}"
         password = signin_data.get('password')
         member: Member = self._member_repository.find_member_by_username(username=username)
@@ -97,7 +97,9 @@ class MemberService:
 
     def _make_member_v2(self, signup_data):
         dormitory_code = signup_data.get('dormitory_code')
-        dorm=Dorm.objects.get(pk=DormList.WEST.id)
+        dorm_id=DormList[(signup_data.get('dorm'))].id
+        dorm=Dorm.objects.get(pk=dorm_id)
+
         member = Member(
             password=signup_data.get('birthday'),
             username=f"{dorm.pk}-{dormitory_code}",

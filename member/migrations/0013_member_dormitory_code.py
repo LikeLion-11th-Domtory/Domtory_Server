@@ -2,6 +2,14 @@
 
 from django.db import migrations, models
 
+def update_member_table(apps, schema_editor):
+    Member = apps.get_model('member', 'Member')
+    for member in Member.objects.all():
+        if member.dormitory_code == None:
+            member.dormitory_code = member.username
+            member.username = f"{member.dorm.pk}-{member.dormitory_code}"
+            member.save()
+
 
 class Migration(migrations.Migration):
 
@@ -15,4 +23,5 @@ class Migration(migrations.Migration):
             name='dormitory_code',
             field=models.CharField(max_length=255, null=True),
         ),
+        migrations.RunPython(update_member_table)
     ]
