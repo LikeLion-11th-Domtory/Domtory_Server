@@ -30,21 +30,23 @@ class SignupRequestSerializerV2(serializers.ModelSerializer):
         fields = ('name', 'phone_number', 'birthday', 'dormitory_code')
     
 class SigninRequestSerialzier(serializers.ModelSerializer):
-    username = serializers.CharField(validators=[])
+    dormitory_code = serializers.CharField(validators=[validate_dormitory_code], error_messages=ERROR_MESSAGE)
+    # username = serializers.CharField(validators=[])
 
     class Meta:
         model = Member
-        fields = ('username', 'password')
+        fields = ('dormitory_code', 'dorm', 'password')
+        # fields = ('username', 'password')
 
 class MemberInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('id', 'username', 'phone_number', 'name', 'dorm', 'birthday', 'status', 'is_staff', 'is_superuser')
+        fields = ('id', 'dormitory_code', 'phone_number', 'name', 'dorm', 'birthday', 'status', 'is_staff', 'is_superuser')
 
 class _MemberResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('id', 'username', 'name', 'is_staff')
+        fields = ('id', 'dormitory_code', 'dorm', 'name', 'is_staff')
 
 class SigninResponseSerializer(serializers.Serializer):
     accessToken = serializers.CharField(source='access_token')

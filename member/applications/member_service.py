@@ -51,7 +51,9 @@ class MemberService:
         signin_request_serializer.is_valid(raise_exception=True)
         signin_data: dict = signin_request_serializer.validated_data
 
-        username = signin_data.get('username')
+        dormitory_code = signin_data.get('dormitory_code')
+        dorm_id = signin_data.get('dorm').pk
+        username = f"{dorm_id}-{dormitory_code}"
         password = signin_data.get('password')
         member: Member = self._member_repository.find_member_by_username(username=username)
 
