@@ -23,11 +23,12 @@ def create_message_room(request, post_id, anonymous_number):
     sender_id = sender.id
     # comment_anonymous_number가 0이면 게시글 작성자가, 1 이상이면 댓글 작성자가 최초 수신자
     if anonymous_number > 0:
-        comment = Comment.objects.get(post=post, anonymous_number=anonymous_number)
+        comment = Comment.objects.filter(post=post, anonymous_number=anonymous_number).latest()
         target_id = comment.member_id
     else:
         is_from_comment = False
         target_id = post.member_id
+
     try:
         message_room = MessageRoom.objects.get(Q(post_id=post_id) &
                                                ((Q(first_sender_id=sender_id) & Q(first_receiver_id=target_id)) |
