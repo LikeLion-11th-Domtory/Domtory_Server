@@ -1,8 +1,4 @@
-from typing import Any
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
-from django.db.models.base import Model
-from django.db.models.query import QuerySet
 from .models import Member, PersonalInfoExcelFile
 from dorm.domains import Dorm
 from django import forms
@@ -42,11 +38,11 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(Group, GroupAdmin)
 
 class MemberCustomAdmin(admin.ModelAdmin):
-    list_display = ['id', 'username', 'name', 'status']
-    list_display_links = ['id', 'username', 'name', 'status']
+    list_display = ['id', 'dormitory_code', 'dorm', 'name', 'status']
+    list_display_links = ['id', 'dormitory_code', 'dorm', 'name', 'status']
     readonly_fields = ('id', 'password', 'is_staff', 'is_superuser')
-    search_fields = ("name", "username")
-    list_filter = ['status']
+    search_fields = ("name", "dormitory_code")
+    list_filter = ['status', 'dorm']
     actions = ["action_change_status"]
 
     def get_queryset(self, request):

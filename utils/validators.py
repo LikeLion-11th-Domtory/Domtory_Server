@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from member.domains import Member
 from dorm.domains import Dorm, DormList
-from django.db.models import Q
 
 ERROR_MESSAGE = {
             'blank': '값을 채워주세요!',
@@ -31,6 +30,12 @@ def validate_nickname(nickname):
     if Member.objects.filter(nickname=nickname).exists():
         raise ValidationError("닉네임이 이미 존재해요! 다른 걸로 부탁해요.")
     
-def validate_dormitory_code(dormitory_code):
-    if Member.objects.filter(Q(username=dormitory_code) & Q(dorm=DormList.WEST.id)).exists():
+# def validate_dormitory_code(dormitory_code):
+#     if Member.objects.filter(Q(username=dormitory_code) & Q(dorm=DormList.WEST.id)).exists():
+#         raise ValidationError("이미 가입 신청한 회원이에요!")
+
+def validate_duplicated_signup(dormitory_code, dorm):
+    dorm_id=DormList[dorm].id
+    username = f"{dorm_id}-{dormitory_code}"
+    if Member.objects.filter(username=username).exists():
         raise ValidationError("이미 가입 신청한 회원이에요!")

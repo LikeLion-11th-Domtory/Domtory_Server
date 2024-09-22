@@ -14,6 +14,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     )
     id = models.BigAutoField(primary_key=True)
     username = models.CharField(unique=True, max_length=255)
+    dormitory_code = models.CharField(null=True, max_length=255)
     password = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=255)
     name = models.CharField(max_length=255)

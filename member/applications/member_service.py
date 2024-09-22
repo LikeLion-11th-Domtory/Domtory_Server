@@ -51,7 +51,9 @@ class MemberService:
         signin_request_serializer.is_valid(raise_exception=True)
         signin_data: dict = signin_request_serializer.validated_data
 
-        username = signin_data.get('username')
+        dormitory_code = signin_data.get('dormitory_code')
+        dorm_id=DormList[(signin_data.get('dorm'))].id
+        username = f"{dorm_id}-{dormitory_code}"
         password = signin_data.get('password')
         member: Member = self._member_repository.find_member_by_username(username=username)
 
@@ -94,13 +96,18 @@ class MemberService:
         return url
 
     def _make_member_v2(self, signup_data):
+        dormitory_code = signup_data.get('dormitory_code')
+        dorm_id=DormList[(signup_data.get('dorm'))].id
+        dorm=Dorm.objects.get(pk=dorm_id)
+
         member = Member(
             password=signup_data.get('birthday'),
-            username=signup_data.get('dormitory_code'),
+            username=f"{dorm.pk}-{dormitory_code}",
+            dormitory_code=dormitory_code,
             phone_number=signup_data.get('phone_number'),
             name=signup_data.get('name'),
             birthday=signup_data.get('birthday'),
-            dorm=Dorm.objects.get(pk=DormList.WEST.id), #서서울관
+            dorm=dorm, #서서울관
             status=Member.MEMBER_STATUS_CHOICES[0][0] #PENDING
         )
         return member
