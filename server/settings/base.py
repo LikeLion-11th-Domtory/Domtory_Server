@@ -35,10 +35,10 @@ ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [
 	'http://localhost:3000',
     'https://localhost:3000',
-    'https://domtory.site',
-    'http://domtory.site',
+    'http://43.203.71.124.nip.io'
+    'https://43.203.71.124.nip.io',
 ]
-CSRF_TRUSTED_ORIGINS = ['https://api.domtory.site',]
+CSRF_TRUSTED_ORIGINS = ['https://43.203.71.124.nip.io']
 
 # Application definition
 
